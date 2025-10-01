@@ -11,6 +11,8 @@ export type StoredVote = {
   votedOnId: string;
   stage1: 'assertive' | 'inassertive';
   stage2: 'truth' | 'lie';
+  isCardVote: boolean;
+  cardAnswer?: string | null;
 };
 
 export interface GameSettings {
@@ -35,3 +37,5 @@ export interface GameResults {
   players: Player[];
   votes: StoredVote[];
 }
+
+    

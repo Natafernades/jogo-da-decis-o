@@ -16,6 +16,17 @@ import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { CARDS } from "@/lib/cards";
 
 
+// Função para embaralhar o array de cartas (algoritmo Fisher-Yates)
+function shuffleArray<T>(array: T[]): T[] {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
+
+
 export default function GamePage() {
   const router = useRouter();
 
@@ -31,6 +42,7 @@ export default function GamePage() {
   const adBanner = useMemo(() => PlaceHolderImages.find(img => img.id === 'paid-ad-banner'), []);
   
   // Card game state
+  const [shuffledDeck, setShuffledDeck] = useState<GameCard[]>([]);
   const [activeCard, setActiveCard] = useState<GameCard | null>(null);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [cardPlayerIndex, setCardPlayerIndex] = useState(0); // Player who draws a card
@@ -53,9 +65,11 @@ export default function GamePage() {
     setPlayers(initialPlayers);
 
     if(parsedSettings.useOnlineCards) {
+      // Embaralha as cartas no início do jogo e armazena no estado
+      const deck = shuffleArray(CARDS);
+      setShuffledDeck(deck);
       setVoteStage('cardSelection');
       setCardPlayerIndex(0);
-      drawNewCard();
     } else {
       // Initial voter is player 0, person being voted on is player 1
       setCurrentPlayerIndex(0);
@@ -63,6 +77,14 @@ export default function GamePage() {
     }
 
   }, [router]);
+  
+  // Efeito para comprar uma nova carta quando o baralho ou o índice do jogador do cartão mudam
+  useEffect(() => {
+    if (settings?.useOnlineCards && voteStage === 'cardSelection' && shuffledDeck.length > 0) {
+      drawNewCard();
+    }
+  }, [shuffledDeck, cardPlayerIndex, settings, voteStage]);
+
 
   const endGame = (finalVote: StoredVote) => {
     localStorage.setItem('gameResults', JSON.stringify({ players, votes: [...allVotes, finalVote] }));
@@ -78,9 +100,22 @@ export default function GamePage() {
   const voterForCardPlayer = useMemo(() => players[voterForCardPlayerIndex], [players, voterForCardPlayerIndex]);
 
   const drawNewCard = () => {
-    const randomIndex = Math.floor(Math.random() * CARDS.length);
-    setActiveCard(CARDS[randomIndex]);
-    setSelectedAnswer(null);
+    // Tira a primeira carta do baralho embaralhado e a remove
+    const [nextCard, ...restOfDeck] = shuffledDeck;
+    
+    if (nextCard) {
+      setActiveCard(nextCard);
+      setShuffledDeck(restOfDeck); // Atualiza o baralho
+      setSelectedAnswer(null);
+    } else {
+      // Se não houver mais cartas, podemos embaralhar novamente ou terminar o jogo
+      // Por agora, vamos reembaralhar
+      const newDeck = shuffleArray(CARDS);
+      const [newNextCard, ...newRest] = newDeck;
+      setActiveCard(newNextCard);
+      setShuffledDeck(newRest);
+      setSelectedAnswer(null);
+    }
   }
 
   const handleSelectAnswer = (answerText: string) => {
@@ -90,7 +125,7 @@ export default function GamePage() {
   }
 
   const handleVoteOnCardPlayer = (stage: 'stage1' | 'stage2', vote: 'assertive' | 'inassertive' | 'truth' | 'lie') => {
-     if (!settings) return;
+     if (!settings || !voterForCardPlayer || !cardPlayer) return;
 
     if (stage === 'stage1') {
       setCurrentVoteStage1(vote as 'assertive' | 'inassertive');
@@ -106,6 +141,8 @@ export default function GamePage() {
       votedOnId: cardPlayer.id, // The person being voted on is the one who chose the card answer
       stage1: currentVoteStage1,
       stage2: vote as 'truth' | 'lie',
+      isCardVote: true,
+      cardAnswer: selectedAnswer
     };
     setAllVotes(prev => [...prev, newVote]);
     
@@ -136,9 +173,11 @@ export default function GamePage() {
       }
       
       setCardPlayerIndex(nextCardPlayerIndex);
-      setVoterForCardPlayerIndex((nextCardPlayerIndex + 1) % players.length);
+      // O próximo votante é o jogador depois daquele que tirou a carta
+      const nextVoterAfterCardPlayer = (nextCardPlayerIndex + 1) % players.length;
+      setVoterForCardPlayerIndex(nextVoterAfterCardPlayer);
       setVoteStage('cardSelection');
-      drawNewCard();
+      // drawNewCard() será chamado pelo useEffect
     } else {
       // Just move to the next voter
       setVoterForCardPlayerIndex(nextVoterIndex);
@@ -161,7 +200,7 @@ export default function GamePage() {
       return;
     }
 
-    if (!currentVoteStage1 || !settings) return;
+    if (!currentVoteStage1 || !settings || !currentPlayer || !playerBeingVotedOn) return;
 
     const newVote: StoredVote = {
       round,
@@ -169,6 +208,7 @@ export default function GamePage() {
       votedOnId: playerBeingVotedOn.id,
       stage1: currentVoteStage1,
       stage2: vote,
+      isCardVote: false,
     };
     setAllVotes(prev => [...prev, newVote]);
 
@@ -381,3 +421,5 @@ export default function GamePage() {
     </div>
   );
 }
+
+    
