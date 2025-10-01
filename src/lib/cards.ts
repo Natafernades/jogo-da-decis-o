@@ -1,3 +1,4 @@
+
 import type { GameCard } from './types';
 
 export const CARDS: GameCard[] = [
@@ -153,5 +154,152 @@ export const CARDS: GameCard[] = [
       { text: "Fica magoado e se afasta.", color: "vermelha" },
       { text: "Revida esquecendo também datas dele.", color: "vermelha" }
     ]
-  }
+  },
+// ======== CARTAS NOVAS ========
+
+// TRABALHO
+{
+  theme: "Trabalho",
+  question: "Um colega assume o mérito de uma ideia sua em reunião.",
+  answers: [
+    { text: "Explica com calma que a ideia foi em conjunto.", color: "azul" },
+    { text: "Chama o colega depois e pede para corrigir.", color: "azul" },
+    { text: "Deixa passar com raiva guardada.", color: "vermelha" },
+    { text: "Confronta publicamente em tom agressivo.", color: "vermelha" }
+  ]
+},
+// MEDO
+{
+  tema: "Medo",
+  question: "Você precisa encarar uma entrevista importante.",
+  answers: [
+    { text: "Treina antes e respira para se acalmar.", color: "azul" },
+    { text: "Enxerga como oportunidade de crescimento.", color: "azul" },
+    { text: "Fica obcecado com a possibilidade de falhar.", color: "vermelha" },
+    { text: "Desiste e não comparece à entrevista.", color: "vermelha" }
+  ]
+},
+// PERDA
+{
+  tema: "Perda",
+  question: "Você perde um grande investimento financeiro.",
+  answers: [
+    { text: "Reavalia os erros e busca alternativas.", color: "azul" },
+    { text: "Conversa com especialistas para melhorar.", color: "azul" },
+    { text: "Se desespera e desiste de tentar novamente.", color: "vermelha" },
+    { text: "Culpa todos à sua volta pela perda.", color: "vermelha" }
+  ]
+},
+// FAMÍLIA
+{
+  tema: "Família",
+  question: "Um parente pede dinheiro que você não pode emprestar.",
+  answers: [
+    { text: "Explica seus limites financeiros.", color: "azul" },
+    { text: "Oferece ajuda de outra forma.", color: "azul" },
+    { text: "Mente dizendo que não tem nada.", color: "vermelha" },
+    { text: "Empresta mesmo sabendo que não pode.", color: "vermelha" }
+  ]
+},
+// AJUDA
+{
+  tema: "Ajuda",
+  question: "Um amigo pede ajuda para mudar de casa no mesmo dia que você tinha compromissos.",
+  answers: [
+    { text: "Explica que pode ajudar em outro horário.", color: "azul" },
+    { text: "Arruma outra forma de apoiar (ex: emprestar carro).", color: "azul" },
+    { text: "Ignora o pedido e inventa desculpas.", color: "vermelha" },
+    { text: "Cancela tudo e vai contrariado.", color: "vermelha" }
+  ]
+},
+// TRAIÇÃO
+{
+  tema: "Traição",
+  question: "Você descobre que um colega escondeu informações para se beneficiar.",
+  answers: [
+    { text: "Confronta e pede transparência.", color: "azul" },
+    { text: "Leva o assunto ao grupo de forma honesta.", color: "azul" },
+    { text: "Se vinga escondendo informações também.", color: "vermelha" },
+    { text: "Faz fofoca para prejudicá-lo.", color: "vermelha" }
+  ]
+},
+// SUPERAÇÃO
+{
+  tema: "Superação",
+  question: "Você não passou em uma prova importante.",
+  answers: [
+    { text: "Revê o conteúdo e tenta novamente.", color: "azul" },
+    { text: "Busca apoio de quem já passou pela experiência.", color: "azul" },
+    { text: "Se convence de que nunca terá capacidade.", color: "vermelha" },
+    { text: "Desiste e critica o sistema.", color: "vermelha" }
+  ]
+},
+// VÍCIO
+{
+  tema: "Vício",
+  question: "Você percebe que está usando muito o celular e perdendo foco.",
+  answers: [
+    { text: "Define limites de tempo e cumpre.", color: "azul" },
+    { text: "Troca o hábito por atividades saudáveis.", color: "azul" },
+    { text: "Finge que não é problema e continua.", color: "vermelha" },
+    { text: "Se isola ainda mais no celular.", color: "vermelha" }
+  ]
+},
+// INJUSTIÇA
+{
+  tema: "Injustiça",
+  question: "Um colega de equipe é elogiado pelo que você fez.",
+  answers: [
+    { text: "Mostra as evidências do seu esforço.", color: "azul" },
+    { text: "Conversa em particular com o líder.", color: "azul" },
+    { text: "Fica quieto e se sente injustiçado.", color: "vermelha" },
+    { text: "Ataca o colega para desmerecer.", color: "vermelha" }
+  ]
+},
+// LIBERDADE
+{
+  tema: "Liberdade",
+  question: "Um parceiro tenta decidir todas as suas escolhas.",
+  answers: [
+    { text: "Mostra seus limites de forma firme.", color: "azul" },
+    { text: "Busca diálogo sobre respeito mútuo.", color: "azul" },
+    { text: "Aceita para não discutir.", color: "vermelha" },
+    { text: "Rompe agressivamente sem diálogo.", color: "vermelha" }
+  ]
+},
+// DOENÇA
+{
+  tema: "Doença",
+  question: "Você está sentindo sintomas preocupantes.",
+  answers: [
+    { text: "Procura um médico imediatamente.", color: "azul" },
+    { text: "Cuida do corpo com bons hábitos.", color: "azul" },
+    { text: "Ignora os sintomas e espera passar.", color: "vermelha" },
+    { text: "Se automedica sem orientação.", color: "vermelha" }
+  ]
+},
+// CULPA
+{
+  tema: "Culpa",
+  question: "Você esqueceu um compromisso importante.",
+  answers: [
+    { text: "Admite o erro e pede desculpas.", color: "azul" },
+    { text: "Tenta remarcar e reparar a falha.", color: "azul" },
+    { text: "Inventa uma desculpa para se justificar.", color: "vermelha" },
+    { text: "Ignora e finge que não aconteceu.", color: "vermelha" }
+  ]
+},
+// AMIZADE
+{
+  tema: "Amizade",
+  question: "Seu amigo não respondeu mensagens por dias.",
+  answers: [
+    { text: "Conversa para entender o que houve.", color: "azul" },
+    { text: "Respeita o espaço e espera o momento certo.", color: "azul" },
+    { text: "Fica com raiva e corta a amizade.", color: "vermelha" },
+    { text: "Faz indiretas para provocar.", color: "vermelha" }
+  ]
+}
 ];
+
+    
