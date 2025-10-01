@@ -100,6 +100,7 @@ export default function GamePage() {
   const voterForCardPlayer = useMemo(() => players[voterForCardPlayerIndex], [players, voterForCardPlayerIndex]);
 
   const drawNewCard = () => {
+    if (shuffledDeck.length === 0) return; // Add guard clause
     const [nextCard, ...restOfDeck] = shuffledDeck;
     
     if (nextCard) {
@@ -120,7 +121,12 @@ export default function GamePage() {
   const handleSelectAnswer = (answerText: string) => {
     setSelectedAnswer(answerText);
     setVoteStage('stage1');
-    setVoterForCardPlayerIndex((cardPlayerIndex + 1) % players.length);
+    let nextVoterIndex = (cardPlayerIndex + 1) % players.length;
+     // Pula o jogador da carta para que ele não vote em si mesmo
+    if (nextVoterIndex === cardPlayerIndex) {
+        nextVoterIndex = (nextVoterIndex + 1) % players.length;
+    }
+    setVoterForCardPlayerIndex(nextVoterIndex);
   }
 
   const handleVoteOnCardPlayer = (stage: 'stage1' | 'stage2', vote: 'assertive' | 'inassertive' | 'truth' | 'lie') => {
@@ -151,6 +157,7 @@ export default function GamePage() {
     
     let nextVoterIndex = (voterForCardPlayerIndex + 1) % players.length;
 
+    // Pula o jogador da carta
     if (nextVoterIndex === cardPlayerIndex) {
       nextVoterIndex = (nextVoterIndex + 1) % players.length;
     }
@@ -159,6 +166,7 @@ export default function GamePage() {
     // The last voter is the one before the card player
     const lastVoterIndex = (cardPlayerIndex - 1 + players.length) % players.length;
     if (voterForCardPlayerIndex === lastVoterIndex) {
+        
       // End of voting for this card. Move to the next player to draw a card.
       const nextCardPlayerIndex = (cardPlayerIndex + 1) % players.length;
 
@@ -174,9 +182,6 @@ export default function GamePage() {
       // Check if there are cards left before moving to the next card player
       if (shuffledDeck.length > 0) {
         setCardPlayerIndex(nextCardPlayerIndex);
-        // O próximo votante é o jogador depois daquele que tirou a carta
-        const nextVoterAfterCardPlayer = (nextCardPlayerIndex + 1) % players.length;
-        setVoterForCardPlayerIndex(nextVoterAfterCardPlayer);
         setVoteStage('cardSelection');
         // drawNewCard() will be called by useEffect
       } else {
