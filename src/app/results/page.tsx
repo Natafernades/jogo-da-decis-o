@@ -10,8 +10,8 @@ import {
   CardDescription
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, Home, Trophy, Gavel } from 'lucide-react';
-import { Player, StoredVote } from '@/lib/types';
+import { Loader2, Home, BarChart } from 'lucide-react';
+import type { Player, StoredVote, GameResults } from '@/lib/types';
 import {
   Table,
   TableBody,
@@ -21,39 +21,92 @@ import {
   TableRow,
 } from "@/components/ui/table"
 
+// --- Categorias de Verdade ---
+function getTruthCategory(percentage: number): string {
+  if (percentage >= 96) return "🧠 Sábio da Verdade – Íntegro e confiável";
+  if (percentage >= 91) return "🔷 Guardião da Consciência – Ético e justo";
+  if (percentage >= 81) return "🔵 Construtor da Verdade – Honesto, pensa antes de agir";
+  if (percentage >= 71) return "🧩 Viajante Consciente – Busca evolução, ainda em formação";
+  if (percentage >= 61) return "🔄 Aprendiz de Si Mesmo – Oscilante, mas em evolução";
+  if (percentage >= 51) return "🎭 Camaleão Emocional – Busca aceitação, muda conforme ambiente";
+  if (percentage >= 41) return "😶 Sobrevivente Interno – Mente para se proteger";
+  if (percentage >= 31) return "🌀 Fuga Emocional – Reativo, mente impulsivamente";
+  if (percentage >= 21) return "🔥 Enganador Afetivo – Manipulador";
+  return "⚫ Desconectado de Si – Alheio à verdade";
+}
+
+// --- Categorias de Assertividade ---
+function getAssertivenessCategory(percentage: number): string {
+  if (percentage >= 96) return "💎 Mestre da Inteligência Emocional – Extremamente assertivo";
+  if (percentage >= 91) return "🧭 Guia Inspirador – Líder positivo, equilibra razão e emoção";
+  if (percentage >= 81) return "🔷 Comunicador Autêntico – Firme e respeitoso";
+  if (percentage >= 71) return "🧘 Equilibrado e Empático – Age com calma e consciência";
+  if (percentage >= 61) return "🌿 Crescimento Assertivo – Em desenvolvimento";
+  if (percentage >= 51) return "🎈 Intenção Positiva – Boa intenção, mas erra execução";
+  if (percentage >= 41) return "🤷 Neutro/Reativo – Passivo em conflitos";
+  if (percentage >= 31) return "🧨 Emocional Inconstante – Impulsivo e instável";
+  if (percentage >= 21) return "⚠ Inassertivo Crônico – Evita conflitos, acumula frustrações";
+  return "🔴 Bloqueado Emocionalmente – Dificuldade extrema de comunicação";
+}
+
+interface PlayerStats {
+    id: string;
+    name: string;
+    truth: number;
+    lie: number;
+    assertive: number;
+    inassertive: number;
+    truthPercentage: number;
+    assertivePercentage: number;
+    truthCategory: string;
+    assertivenessCategory: string;
+}
+
 export default function ResultsPage() {
   const router = useRouter();
-  const [players, setPlayers] = useState<Player[]>([]);
-  const [votes, setVotes] = useState<StoredVote[]>([]);
+  const [results, setResults] = useState<PlayerStats[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const resultsData = localStorage.getItem('gameResults');
     if (resultsData) {
-      const { players, votes } = JSON.parse(resultsData);
-      setPlayers(players);
-      setVotes(votes);
+      const { players, votes }: GameResults = JSON.parse(resultsData);
+      
+      const playerStats = players.map(player => {
+        const votesReceived = votes.filter(vote => vote.votedOnId === player.id);
+        
+        const truth = votesReceived.filter(v => v.stage2 === 'truth').length;
+        const lie = votesReceived.filter(v => v.stage2 === 'lie').length;
+        const assertive = votesReceived.filter(v => v.stage1 === 'assertive').length;
+        const inassertive = votesReceived.filter(v => v.stage1 === 'inassertive').length;
+
+        const totalTruthLie = truth + lie;
+        const totalAssertiveInassertive = assertive + inassertive;
+
+        const truthPercentage = totalTruthLie > 0 ? Math.round((truth / totalTruthLie) * 100) : 0;
+        const assertivePercentage = totalAssertiveInassertive > 0 ? Math.round((assertive / totalAssertiveInassertive) * 100) : 0;
+        
+        return {
+            id: player.id,
+            name: player.name,
+            truth,
+            lie,
+            assertive,
+            inassertive,
+            truthPercentage,
+            assertivePercentage,
+            truthCategory: getTruthCategory(truthPercentage),
+            assertivenessCategory: getAssertivenessCategory(assertivePercentage),
+        }
+      });
+
+      setResults(playerStats);
     } else {
-      // No results, go home
       router.push('/');
     }
     setLoading(false);
   }, [router]);
 
-  const results = useMemo(() => {
-    if (!players.length || !votes.length) return [];
-
-    const playerScores = players.map(player => {
-        const nominationsReceived = votes.filter(vote => vote.votedOnId === player.id).length;
-        return {
-            ...player,
-            nominations: nominationsReceived,
-        }
-    });
-
-    return playerScores.sort((a, b) => b.nominations - a.nominations);
-
-  }, [players, votes]);
 
   const handlePlayAgain = () => {
     localStorage.removeItem('gameResults');
@@ -71,36 +124,47 @@ export default function ResultsPage() {
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-4 sm:p-6 md:p-8 bg-background">
-      <Card className="w-full max-w-lg shadow-lg">
+      <Card className="w-full max-w-6xl shadow-lg">
         <CardHeader className="text-center">
-            <div className="mx-auto mb-4 text-amber-500">
-                <Trophy className="h-14 w-14" />
+            <div className="mx-auto mb-4 text-primary">
+                <BarChart className="h-14 w-14" />
             </div>
-          <CardTitle className="font-headline text-3xl">Resultados Finais</CardTitle>
-          <CardDescription>O jogo terminou. Veja o placar final.</CardDescription>
+          <CardTitle className="font-headline text-3xl">📊 Resultado Final - Jogo da Decisão</CardTitle>
+          <CardDescription>O jogo terminou. Veja o placar final e as categorias.</CardDescription>
         </CardHeader>
         <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-[80px]">Posição</TableHead>
-                  <TableHead>Jogador</TableHead>
-                  <TableHead className="text-right">Votos Recebidos</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {results.map((player, index) => (
-                  <TableRow key={player.id} className={index === 0 ? 'bg-amber-100 dark:bg-amber-900/30' : ''}>
-                    <TableCell className="font-bold text-lg">{index + 1}º</TableCell>
-                    <TableCell className="font-medium">{player.name}</TableCell>
-                    <TableCell className="text-right font-bold text-lg flex items-center justify-end gap-2">
-                        <Gavel className="h-4 w-4 text-muted-foreground"/>
-                        {player.nominations}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+            <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Nome</TableHead>
+                      <TableHead>Verdade</TableHead>
+                      <TableHead>Mentira</TableHead>
+                      <TableHead>Azul</TableHead>
+                      <TableHead>Vermelho</TableHead>
+                      <TableHead>% Verdade</TableHead>
+                      <TableHead>% Azul</TableHead>
+                      <TableHead>Categoria Verdade</TableHead>
+                      <TableHead>Categoria Assertividade</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {results.map((player) => (
+                      <TableRow key={player.id}>
+                        <TableCell className="font-medium">{player.name}</TableCell>
+                        <TableCell>{player.truth}</TableCell>
+                        <TableCell>{player.lie}</TableCell>
+                        <TableCell>{player.assertive}</TableCell>
+                        <TableCell>{player.inassertive}</TableCell>
+                        <TableCell>{player.truthPercentage}%</TableCell>
+                        <TableCell>{player.assertivePercentage}%</TableCell>
+                        <TableCell>{player.truthCategory}</TableCell>
+                        <TableCell>{player.assertivenessCategory}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+            </div>
         </CardContent>
         <CardContent className="flex justify-center pt-6">
            <Button onClick={handlePlayAgain}>

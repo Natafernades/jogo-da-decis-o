@@ -64,6 +64,11 @@ export default function GamePage() {
 
   }, [router]);
 
+  const endGame = (finalVote: StoredVote) => {
+    localStorage.setItem('gameResults', JSON.stringify({ players, votes: [...allVotes, finalVote] }));
+    router.push('/results');
+  };
+
   // --- Regular Game Logic ---
   const currentPlayer = useMemo(() => players[currentPlayerIndex], [players, currentPlayerIndex]);
   const playerBeingVotedOn = useMemo(() => players[playerBeingVotedOnIndex], [players, playerBeingVotedOnIndex]);
@@ -108,25 +113,30 @@ export default function GamePage() {
     setCurrentVoteStage1(null);
     setVoteStage('stage1');
     
-    const nextVoterIndex = (voterForCardPlayerIndex + 1) % players.length;
+    let nextVoterIndex = (voterForCardPlayerIndex + 1) % players.length;
+
+    if (nextVoterIndex === cardPlayerIndex) {
+      nextVoterIndex = (nextVoterIndex + 1) % players.length;
+    }
     
     // Check if everyone has voted on the current card player
-    if (nextVoterIndex === cardPlayerIndex) {
+    // The last voter is the one before the card player
+    const lastVoterIndex = (cardPlayerIndex - 1 + players.length) % players.length;
+    if (voterForCardPlayerIndex === lastVoterIndex) {
       // End of voting for this card. Move to the next player to draw a card.
       const nextCardPlayerIndex = (cardPlayerIndex + 1) % players.length;
 
       // Check for end of round
       if (nextCardPlayerIndex === 0) {
         if (round + 1 > settings.numRounds) {
-          // GAME OVER
-          localStorage.setItem('gameResults', JSON.stringify({ players, votes: [...allVotes, newVote] }));
-          router.push('/results');
+          endGame(newVote);
           return;
         }
         setRound(r => r + 1);
       }
       
       setCardPlayerIndex(nextCardPlayerIndex);
+      setVoterForCardPlayerIndex((nextCardPlayerIndex + 1) % players.length);
       setVoteStage('cardSelection');
       drawNewCard();
     } else {
@@ -173,22 +183,29 @@ export default function GamePage() {
       nextVoterIndex = (nextVoterIndex + 1) % players.length;
     }
 
-    if (nextVoterIndex === (playerBeingVotedOnIndex + 1) % players.length) {
+    // Have all players (except the one being voted on) voted?
+    // The last voter is the one right before playerBeingVotedOnIndex.
+    const lastVoterIndex = (playerBeingVotedOnIndex - 1 + players.length) % players.length;
+
+    if (currentPlayerIndex === lastVoterIndex) {
+      // End of votes for this player. Move to the next player to be voted on.
       const nextPlayerBeingVotedOnIndex = (playerBeingVotedOnIndex + 1) % players.length;
       
+      // Check for end of round
       if (nextPlayerBeingVotedOnIndex === 0) { 
         if(round + 1 > settings.numRounds) {
-          localStorage.setItem('gameResults', JSON.stringify({ players, votes: [...allVotes, newVote] }));
-          router.push('/results');
+          endGame(newVote);
           return;
         }
         setRound(r => r + 1);
       }
       
+      let nextVoterIndexAfterRoundEnd = (nextPlayerBeingVotedOnIndex + 1) % players.length;
       setPlayerBeingVotedOnIndex(nextPlayerBeingVotedOnIndex);
-      setCurrentPlayerIndex((nextPlayerBeingVotedOnIndex + 1) % players.length);
+      setCurrentPlayerIndex(nextVoterIndexAfterRoundEnd);
 
     } else {
+      // Just move to next voter
       setCurrentPlayerIndex(nextVoterIndex);
     }
   };
@@ -296,7 +313,7 @@ export default function GamePage() {
 
           <Card className="shadow-xl">
             <CardHeader>
-                <div className="space-y-2 text-center -mt-4 mb-8">
+                <div className="space-y-2 text-center mb-8">
                     <p className="text-lg font-medium text-muted-foreground flex items-center justify-center gap-2"><User className="h-5 w-5 text-rose-500"/>Sendo avaliado</p>
                     <p className="text-3xl font-bold">{personBeingVotedOn.name}</p>
                     {settings.useOnlineCards && selectedAnswer && (
@@ -305,7 +322,7 @@ export default function GamePage() {
                 </div>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="space-y-2 text-center mb-6">
+               <div className="space-y-2 text-center mb-6">
                 <p className="text-lg font-medium text-muted-foreground flex items-center justify-center gap-2"><Crown className="h-5 w-5 text-primary"/>Jogador a votar</p>
                 <CardTitle className="text-4xl font-headline">{personVoting.name}</CardTitle>
               </div>

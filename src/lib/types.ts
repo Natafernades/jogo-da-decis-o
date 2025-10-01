@@ -30,3 +30,8 @@ export interface GameCard {
   question: string;
   answers: CardAnswer[];
 }
+
+export interface GameResults {
+  players: Player[];
+  votes: StoredVote[];
+}
