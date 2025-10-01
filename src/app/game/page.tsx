@@ -171,12 +171,22 @@ export default function GamePage() {
         setRound(r => r + 1);
       }
       
-      setCardPlayerIndex(nextCardPlayerIndex);
-      // O próximo votante é o jogador depois daquele que tirou a carta
-      const nextVoterAfterCardPlayer = (nextCardPlayerIndex + 1) % players.length;
-      setVoterForCardPlayerIndex(nextVoterAfterCardPlayer);
-      setVoteStage('cardSelection');
-      // drawNewCard() será chamado pelo useEffect
+      // Check if there are cards left before moving to the next card player
+      if (shuffledDeck.length > 0) {
+        setCardPlayerIndex(nextCardPlayerIndex);
+        // O próximo votante é o jogador depois daquele que tirou a carta
+        const nextVoterAfterCardPlayer = (nextCardPlayerIndex + 1) % players.length;
+        setVoterForCardPlayerIndex(nextVoterAfterCardPlayer);
+        setVoteStage('cardSelection');
+        // drawNewCard() will be called by useEffect
+      } else {
+        // No cards left, switch to normal mode
+        setActiveCard(null);
+        setVoteStage('stage1');
+        // Start normal voting from where it would be
+        setCurrentPlayerIndex(0);
+        setPlayerBeingVotedOnIndex(1 % settings.numPlayers);
+      }
     } else {
       // Just move to the next voter
       setVoterForCardPlayerIndex(nextVoterIndex);
