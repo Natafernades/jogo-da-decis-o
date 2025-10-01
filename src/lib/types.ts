@@ -3,7 +3,9 @@ export interface Player {
   name: string;
 }
 
-export type VoteStage = 'cardSelection' | 'stage1' | 'stage2' | 'finished';
+export type GameStage = 'card_selection' | 'voting' | 'finished';
+
+export type VoteStage = 'stage1' | 'stage2';
 
 export type StoredVote = {
   round: number;
@@ -11,7 +13,7 @@ export type StoredVote = {
   votedOnId: string;
   stage1: 'assertive' | 'inassertive';
   stage2: 'truth' | 'lie';
-  isCardVote: boolean;
+  cardQuestion?: string;
   cardAnswer?: string | null;
 };
 
@@ -37,5 +39,3 @@ export interface GameResults {
   players: Player[];
   votes: StoredVote[];
 }
-
-    

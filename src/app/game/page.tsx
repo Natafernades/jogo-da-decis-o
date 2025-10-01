@@ -11,12 +11,12 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Home, Loader2, CheckCircle, XCircle, User, Crown, HelpCircle } from "lucide-react";
-import type { GameSettings, Player, VoteStage, StoredVote, GameCard } from "@/lib/types";
+import type { GameSettings, Player, VoteStage, StoredVote, GameCard, GameStage } from "@/lib/types";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { CARDS } from "@/lib/cards";
 
 
-// Função para embaralhar o array de cartas (algoritmo Fisher-Yates)
+// Função para embaralhar o array (algoritmo Fisher-Yates)
 function shuffleArray<T>(array: T[]): T[] {
   const shuffled = [...array];
   for (let i = shuffled.length - 1; i > 0; i--) {
@@ -33,21 +33,20 @@ export default function GamePage() {
   const [settings, setSettings] = useState<GameSettings | null>(null);
   const [players, setPlayers] = useState<Player[]>([]);
   const [round, setRound] = useState(1);
-  const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
-  const [playerBeingVotedOnIndex, setPlayerBeingVotedOnIndex] = useState(1);
+  const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0); // Who is voting
+  const [playerBeingVotedOnIndex, setPlayerBeingVotedOnIndex] = useState(0); // Who is being evaluated
   
   const [allVotes, setAllVotes] = useState<StoredVote[]>([]);
   const [currentVoteStage1, setCurrentVoteStage1] = useState<'assertive' | 'inassertive' | null>(null);
   const [voteStage, setVoteStage] = useState<VoteStage>('stage1');
+  const [gameStage, setGameStage] = useState<GameStage>('voting');
+
   const adBanner = useMemo(() => PlaceHolderImages.find(img => img.id === 'paid-ad-banner'), []);
   
   // Card game state
   const [shuffledDeck, setShuffledDeck] = useState<GameCard[]>([]);
   const [activeCard, setActiveCard] = useState<GameCard | null>(null);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
-  const [cardPlayerIndex, setCardPlayerIndex] = useState(0); // Player who draws a card
-  const [voterForCardPlayerIndex, setVoterForCardPlayerIndex] = useState(1); // Player who votes on the card player
-
 
   useEffect(() => {
     const storedSettings = localStorage.getItem("gameSettings");
@@ -64,73 +63,81 @@ export default function GamePage() {
     }));
     setPlayers(initialPlayers);
 
-    if(parsedSettings.useOnlineCards) {
-      // Embaralha as cartas no início do jogo e armazena no estado
+    setPlayerBeingVotedOnIndex(0);
+
+    if (parsedSettings.useOnlineCards) {
       const deck = shuffleArray(CARDS);
       setShuffledDeck(deck);
-      setVoteStage('cardSelection');
-      setCardPlayerIndex(0);
+      setGameStage('card_selection');
+      setActiveCard(deck[0] || null); // Draw the first card
     } else {
-      // Initial voter is player 0, person being voted on is player 1
-      setCurrentPlayerIndex(0);
-      setPlayerBeingVotedOnIndex(1 % parsedSettings.numPlayers);
+      setGameStage('voting');
+      // Initial voter is player 1, person being voted on is player 0
+      setCurrentPlayerIndex(1 % parsedSettings.numPlayers);
     }
-
   }, [router]);
-  
-  // Efeito para comprar uma nova carta quando o baralho ou o índice do jogador do cartão mudam
-  useEffect(() => {
-    if (settings?.useOnlineCards && voteStage === 'cardSelection' && shuffledDeck.length > 0) {
-      drawNewCard();
-    }
-  }, [shuffledDeck, cardPlayerIndex, settings, voteStage]);
-
 
   const endGame = (finalVote: StoredVote) => {
     localStorage.setItem('gameResults', JSON.stringify({ players, votes: [...allVotes, finalVote] }));
     router.push('/results');
   };
-
-  // --- Regular Game Logic ---
+  
   const currentPlayer = useMemo(() => players[currentPlayerIndex], [players, currentPlayerIndex]);
   const playerBeingVotedOn = useMemo(() => players[playerBeingVotedOnIndex], [players, playerBeingVotedOnIndex]);
 
-  // --- Card Game Logic ---
-  const cardPlayer = useMemo(() => players[cardPlayerIndex], [players, cardPlayerIndex]);
-  const voterForCardPlayer = useMemo(() => players[voterForCardPlayerIndex], [players, voterForCardPlayerIndex]);
-
-  const drawNewCard = () => {
-    if (shuffledDeck.length === 0) return; // Add guard clause
-    const [nextCard, ...restOfDeck] = shuffledDeck;
+  const advanceToNextPlayerOrRound = () => {
+    if (!settings) return;
     
-    if (nextCard) {
-      setActiveCard(nextCard);
-      setShuffledDeck(restOfDeck); // Atualiza o baralho sem reembaralhar
-      setSelectedAnswer(null);
+    // --- End of votes for the current player. Move to the next player to be voted on.
+    const nextPlayerBeingVotedOnIndex = (playerBeingVotedOnIndex + 1) % players.length;
+
+    // Check for end of round
+    if (nextPlayerBeingVotedOnIndex === 0) {
+      if (round + 1 > settings.numRounds) {
+        // This was the last vote, end game (we need a placeholder vote)
+        const placeholderVote: StoredVote = { round, voterId: 'system', votedOnId: 'system', stage1: 'assertive', stage2: 'truth' };
+        endGame(placeholderVote);
+        return;
+      }
+      setRound(r => r + 1);
+    }
+    
+    setPlayerBeingVotedOnIndex(nextPlayerBeingVotedOnIndex);
+    
+    if (settings.useOnlineCards) {
+      // Draw a new card for the next player
+      const nextCardIndex = allVotes.filter(v => v.cardAnswer).length;
+      if (nextCardIndex < shuffledDeck.length) {
+        setActiveCard(shuffledDeck[nextCardIndex]);
+        setGameStage('card_selection');
+        setSelectedAnswer(null); // Clear previous answer
+      } else {
+        // No cards left, switch to normal voting for the rest of the game
+        setGameStage('voting');
+        setActiveCard(null);
+        let nextVoter = (nextPlayerBeingVotedOnIndex + 1) % players.length;
+        setCurrentPlayerIndex(nextVoter);
+      }
     } else {
-      // Se não houver mais cartas, encerra o modo de cartas.
-      // O jogo pode continuar no modo normal se houver rodadas restantes.
-      setActiveCard(null);
-      // Muda para a votação normal para o restante do jogo
-      setVoteStage('stage1');
-      setCurrentPlayerIndex(0);
-      setPlayerBeingVotedOnIndex(1 % (settings?.numPlayers || 1));
+        // Set the next voter for normal mode
+        let nextVoter = (nextPlayerBeingVotedOnIndex + 1) % players.length;
+        setCurrentPlayerIndex(nextVoter);
     }
-  }
+  };
 
-  const handleSelectAnswer = (answerText: string) => {
+  const handleSelectCardAnswer = (answerText: string) => {
     setSelectedAnswer(answerText);
+    setGameStage('voting');
+
+    // Start voting process
+    let firstVoterIndex = (playerBeingVotedOnIndex + 1) % players.length;
+    setCurrentPlayerIndex(firstVoterIndex);
     setVoteStage('stage1');
-    let nextVoterIndex = (cardPlayerIndex + 1) % players.length;
-     // Pula o jogador da carta para que ele não vote em si mesmo
-    if (nextVoterIndex === cardPlayerIndex) {
-        nextVoterIndex = (nextVoterIndex + 1) % players.length;
-    }
-    setVoterForCardPlayerIndex(nextVoterIndex);
+    setCurrentVoteStage1(null);
   }
 
-  const handleVoteOnCardPlayer = (stage: 'stage1' | 'stage2', vote: 'assertive' | 'inassertive' | 'truth' | 'lie') => {
-     if (!settings || !voterForCardPlayer || !cardPlayer) return;
+  const handleVote = (stage: VoteStage, vote: 'assertive' | 'inassertive' | 'truth' | 'lie') => {
+    if (!settings || !currentPlayer || !playerBeingVotedOn) return;
 
     if (stage === 'stage1') {
       setCurrentVoteStage1(vote as 'assertive' | 'inassertive');
@@ -138,101 +145,28 @@ export default function GamePage() {
       return;
     }
 
-    // Stage 2
+    // Stage 2 vote
     if (!currentVoteStage1) return;
-    const newVote: StoredVote = {
-      round,
-      voterId: voterForCardPlayer.id,
-      votedOnId: cardPlayer.id, // The person being voted on is the one who chose the card answer
-      stage1: currentVoteStage1,
-      stage2: vote as 'truth' | 'lie',
-      isCardVote: true,
-      cardAnswer: selectedAnswer
-    };
-    setAllVotes(prev => [...prev, newVote]);
-    
-    // Reset for next voter
-    setCurrentVoteStage1(null);
-    setVoteStage('stage1');
-    
-    let nextVoterIndex = (voterForCardPlayerIndex + 1) % players.length;
-
-    // Pula o jogador da carta
-    if (nextVoterIndex === cardPlayerIndex) {
-      nextVoterIndex = (nextVoterIndex + 1) % players.length;
-    }
-    
-    // Check if everyone has voted on the current card player
-    // The last voter is the one before the card player
-    const lastVoterIndex = (cardPlayerIndex - 1 + players.length) % players.length;
-    if (voterForCardPlayerIndex === lastVoterIndex) {
-        
-      // End of voting for this card. Move to the next player to draw a card.
-      const nextCardPlayerIndex = (cardPlayerIndex + 1) % players.length;
-
-      // Check for end of round
-      if (nextCardPlayerIndex === 0) {
-        if (round + 1 > settings.numRounds) {
-          endGame(newVote);
-          return;
-        }
-        setRound(r => r + 1);
-      }
-      
-      // Check if there are cards left before moving to the next card player
-      if (shuffledDeck.length > 0) {
-        setCardPlayerIndex(nextCardPlayerIndex);
-        setVoteStage('cardSelection');
-        // drawNewCard() will be called by useEffect
-      } else {
-        // No cards left, switch to normal mode
-        setActiveCard(null);
-        setVoteStage('stage1');
-        // Start normal voting from where it would be
-        setCurrentPlayerIndex(0);
-        setPlayerBeingVotedOnIndex(1 % settings.numPlayers);
-      }
-    } else {
-      // Just move to the next voter
-      setVoterForCardPlayerIndex(nextVoterIndex);
-    }
-  };
-
-
-  const handleStage1Vote = (vote: 'assertive' | 'inassertive') => {
-    if(settings?.useOnlineCards && activeCard) {
-      handleVoteOnCardPlayer('stage1', vote);
-    } else {
-      setCurrentVoteStage1(vote);
-      setVoteStage('stage2');
-    }
-  };
-
-  const handleStage2Vote = (vote: 'truth' | 'lie') => {
-    if(settings?.useOnlineCards && activeCard) {
-      handleVoteOnCardPlayer('stage2', vote);
-      return;
-    }
-
-    if (!currentVoteStage1 || !settings || !currentPlayer || !playerBeingVotedOn) return;
 
     const newVote: StoredVote = {
       round,
       voterId: currentPlayer.id,
       votedOnId: playerBeingVotedOn.id,
       stage1: currentVoteStage1,
-      stage2: vote,
-      isCardVote: false,
+      stage2: vote as 'truth' | 'lie',
+      cardQuestion: settings.useOnlineCards && activeCard ? activeCard.question : undefined,
+      cardAnswer: settings.useOnlineCards ? selectedAnswer : null,
     };
     setAllVotes(prev => [...prev, newVote]);
 
     // Reset for next voter
     setCurrentVoteStage1(null);
     setVoteStage('stage1');
-
+    
     // --- Advance Logic ---
     let nextVoterIndex = (currentPlayerIndex + 1) % players.length;
     
+    // Skip the person being voted on
     if (nextVoterIndex === playerBeingVotedOnIndex) {
       nextVoterIndex = (nextVoterIndex + 1) % players.length;
     }
@@ -242,29 +176,14 @@ export default function GamePage() {
     const lastVoterIndex = (playerBeingVotedOnIndex - 1 + players.length) % players.length;
 
     if (currentPlayerIndex === lastVoterIndex) {
-      // End of votes for this player. Move to the next player to be voted on.
-      const nextPlayerBeingVotedOnIndex = (playerBeingVotedOnIndex + 1) % players.length;
-      
-      // Check for end of round
-      if (nextPlayerBeingVotedOnIndex === 0) { 
-        if(round + 1 > settings.numRounds) {
-          endGame(newVote);
-          return;
-        }
-        setRound(r => r + 1);
-      }
-      
-      let nextVoterIndexAfterRoundEnd = (nextPlayerBeingVotedOnIndex + 1) % players.length;
-      setPlayerBeingVotedOnIndex(nextPlayerBeingVotedOnIndex);
-      setCurrentPlayerIndex(nextVoterIndexAfterRoundEnd);
-
+      advanceToNextPlayerOrRound();
     } else {
       // Just move to next voter
       setCurrentPlayerIndex(nextVoterIndex);
     }
   };
   
-  if (!settings || players.length === 0) {
+  if (!settings || players.length === 0 || !playerBeingVotedOn) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
         <Loader2 className="h-12 w-12 animate-spin text-primary" />
@@ -273,7 +192,7 @@ export default function GamePage() {
   }
 
   // --- RENDER CARD SELECTION ---
-  if (settings.useOnlineCards && voteStage === 'cardSelection' && activeCard && cardPlayer) {
+  if (settings.useOnlineCards && gameStage === 'card_selection' && activeCard) {
     return (
       <div className="flex flex-col min-h-screen bg-background">
         <div className="flex-grow flex flex-col items-center justify-center p-4 sm:p-6 lg:p-8">
@@ -292,8 +211,8 @@ export default function GamePage() {
               <Card className="shadow-xl">
                 <CardHeader>
                     <div className="space-y-2 text-center mb-6">
-                        <p className="text-lg font-medium text-muted-foreground flex items-center justify-center gap-2"><Crown className="h-5 w-5 text-primary"/>Jogador a escolher</p>
-                        <CardTitle className="text-4xl font-headline">{cardPlayer.name}</CardTitle>
+                        <p className="text-lg font-medium text-muted-foreground flex items-center justify-center gap-2"><User className="h-5 w-5 text-rose-500"/>Sendo avaliado</p>
+                        <CardTitle className="text-4xl font-headline">{playerBeingVotedOn.name}</CardTitle>
                     </div>
                 </CardHeader>
                 <CardContent className="space-y-6 text-center">
@@ -305,7 +224,7 @@ export default function GamePage() {
                                 key={idx}
                                 size="lg"
                                 className={`h-24 text-lg flex-col gap-1 ${ans.color === 'azul' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-red-600 hover:bg-red-700'} text-white`}
-                                onClick={() => handleSelectAnswer(ans.text)}
+                                onClick={() => handleSelectCardAnswer(ans.text)}
                             >
                                 {ans.text}
                             </Button>
@@ -338,11 +257,8 @@ export default function GamePage() {
     );
   }
   
-  // --- RENDER VOTING STAGES (FOR BOTH MODES) ---
-  const personVoting = settings.useOnlineCards && activeCard ? voterForCardPlayer : currentPlayer;
-  const personBeingVotedOn = settings.useOnlineCards && activeCard ? cardPlayer : playerBeingVotedOn;
-
-  if (!personVoting || !personBeingVotedOn) {
+  // --- RENDER VOTING STAGES ---
+  if (!currentPlayer) {
      return (
       <div className="flex min-h-screen items-center justify-center bg-background">
         <Loader2 className="h-12 w-12 animate-spin text-primary" />
@@ -369,7 +285,7 @@ export default function GamePage() {
             <CardHeader>
                 <div className="space-y-2 text-center mb-8">
                     <p className="text-lg font-medium text-muted-foreground flex items-center justify-center gap-2"><User className="h-5 w-5 text-rose-500"/>Sendo avaliado</p>
-                    <p className="text-3xl font-bold">{personBeingVotedOn.name}</p>
+                    <p className="text-3xl font-bold">{playerBeingVotedOn.name}</p>
                     {settings.useOnlineCards && selectedAnswer && (
                       <blockquote className="text-xl italic border-l-4 pl-4 mt-2">"{selectedAnswer}"</blockquote>
                     )}
@@ -378,7 +294,7 @@ export default function GamePage() {
             <CardContent className="space-y-6">
                <div className="space-y-2 text-center mb-6">
                 <p className="text-lg font-medium text-muted-foreground flex items-center justify-center gap-2"><Crown className="h-5 w-5 text-primary"/>Jogador a votar</p>
-                <CardTitle className="text-4xl font-headline">{personVoting.name}</CardTitle>
+                <CardTitle className="text-4xl font-headline">{currentPlayer.name}</CardTitle>
               </div>
 
               <div className={`space-y-3 transition-opacity duration-300 ${voteStage !== 'stage1' ? 'opacity-30' : ''}`}>
@@ -386,11 +302,11 @@ export default function GamePage() {
                   Etapa 1: Classificação
                 </h3>
                 <div className="grid grid-cols-2 gap-4">
-                  <Button size="lg" className="h-24 flex-col gap-1 bg-blue-600 hover:bg-blue-700 text-white text-lg" disabled={voteStage !== 'stage1'} onClick={() => handleStage1Vote('assertive')}>
+                  <Button size="lg" className="h-24 flex-col gap-1 bg-blue-600 hover:bg-blue-700 text-white text-lg" disabled={voteStage !== 'stage1'} onClick={() => handleVote('stage1', 'assertive')}>
                     <CheckCircle/>
                     Assertivo
                   </Button>
-                  <Button size="lg" className="h-24 flex-col gap-1 bg-red-600 hover:bg-red-700 text-white text-lg" disabled={voteStage !== 'stage1'} onClick={() => handleStage1Vote('inassertive')}>
+                  <Button size="lg" className="h-24 flex-col gap-1 bg-red-600 hover:bg-red-700 text-white text-lg" disabled={voteStage !== 'stage1'} onClick={() => handleVote('stage1', 'inassertive')}>
                     <XCircle/>
                     Inassertivo
                   </Button>
@@ -401,10 +317,10 @@ export default function GamePage() {
                   Etapa 2: Julgamento
                 </h3>
                 <div className="grid grid-cols-2 gap-4">
-                  <Button size="lg" className="h-24 flex-col gap-1 bg-green-600 hover:bg-green-700 text-white text-lg" disabled={voteStage !== 'stage2'} onClick={() => handleStage2Vote('truth')}>
+                  <Button size="lg" className="h-24 flex-col gap-1 bg-green-600 hover:bg-green-700 text-white text-lg" disabled={voteStage !== 'stage2'} onClick={() => handleVote('stage2', 'truth')}>
                     Verdade
                   </Button>
-                  <Button size="lg" className="h-24 flex-col gap-1 bg-yellow-500 hover:bg-yellow-600 text-white text-lg" disabled={voteStage !== 'stage2'} onClick={() => handleStage2Vote('lie')}>
+                  <Button size="lg" className="h-24 flex-col gap-1 bg-yellow-500 hover:bg-yellow-600 text-white text-lg" disabled={voteStage !== 'stage2'} onClick={() => handleVote('stage2', 'lie')}>
                     Mentira
                   </Button>
                 </div>
