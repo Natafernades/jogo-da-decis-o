@@ -1,0 +1,61 @@
+import type { SVGProps } from 'react';
+
+export function LogoIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+        {...props}
+        xmlns="http://www.w3.org/2000/svg"
+        width="1200" height="1200" viewBox="0 0 1200 1200" role="img" aria-labelledby="title desc">
+    <title id="title">Cabana das Decisões — Logo</title>
+    <desc id="desc">Logotipo estilizado: cabana de madeira, nome do jogo, setas cruzadas e texto 'Escolha e Consequência'.</desc>
+    <rect width="100%" height="100%" fill="none"/>
+    <ellipse cx="600" cy="980" rx="300" ry="36" fill="#2b1f17" opacity="0.12"/>
+    <g id="cabin">
+        <polygon points="180,520 600,220 1020,520" fill="#5c3826" stroke="#3e2416" strokeWidth="8"/>
+        <g opacity="0.12" fill="#000">
+        <rect x="200" y="430" width="820" height="6" transform="rotate(-15 610 433)"/>
+        <rect x="220" y="390" width="820" height="6" transform="rotate(-15 630 393)"/>
+        </g>
+        <rect x="220" y="520" width="760" height="360" rx="18" ry="18" fill="#8c5a3d" stroke="#4f2f20" strokeWidth="8"/>
+        <g fill="#7b5138" opacity="0.22">
+        <rect x="240" y="540" width="720" height="8"/>
+        <rect x="240" y="580" width="720" height="8"/>
+        <rect x="240" y="620" width="720" height="8"/>
+        <rect x="240" y="660" width="720" height="8"/>
+        <rect x="240" y="700" width="720" height="8"/>
+        <rect x="240" y="740" width="720" height="8"/>
+        </g>
+        <rect x="520" y="660" width="160" height="220" rx="8" ry="8" fill="#3f271b" stroke="#2a1610" strokeWidth="6"/>
+        <circle cx="660" cy="770" r="6" fill="#f2c94c"/>
+        <rect x="320" y="640" width="120" height="90" rx="6" ry="6" fill="#f6e9d6" stroke="#2a1610" strokeWidth="5"/>
+        <rect x="760" y="640" width="120" height="90" rx="6" ry="6" fill="#f6e9d6" stroke="#2a1610" strokeWidth="5"/>
+        <line x1="380" y1="640" x2="380" y2="730" stroke="#2a1610" strokeWidth="6"/>
+        <line x1="320" y1="685" x2="440" y2="685" stroke="#2a1610" strokeWidth="6"/>
+        <line x1="820" y1="640" x2="820" y2="730" stroke="#2a1610" strokeWidth="6"/>
+        <line x1="760" y1="685" x2="880" y2="685" stroke="#2a1610" strokeWidth="6"/>
+    </g>
+    <g transform="translate(980,780) scale(0.8)">
+        <ellipse cx="0" cy="38" rx="42" ry="12" fill="#2b1f17" opacity="0.16"/>
+        <path d="M-4 18 C -2 6, 8 0, 6 -10 C 4 -18, -6 -12, -8 -6 C -9 0, -6 9, -4 18 Z" fill="#ff7a18" />
+        <path d="M4 10 C 2 2, -4 -2, -2 -8 C -1 -12, 2 -9, 4 -6 C 6 -3, 6 6, 4 10 Z" fill="#f8b500" opacity="0.9"/>
+    </g>
+    <g fontFamily="Segoe UI, Roboto, Arial, sans-serif" textAnchor="middle" fill="#1f130e">
+        <text x="600" y="920" fontSize="68" fontWeight="700" fill="#2b1f17">JOGO DA DECISÃO</text>
+        <text x="600" y="985" fontSize="34" fontWeight="600" fill="#5b3c2c" opacity="0.95">Evolução Emocional e Comportamental</text>
+    </g>
+    <g transform="translate(600,1060)">
+        <g transform="rotate(-25)">
+        <rect x="-220" y="-10" width="420" height="22" rx="12" fill="#3e2a20" opacity="0.95"/>
+        <polygon points="200,-10 240,0 200,10" fill="#3e2a20"/>
+        <rect x="-220" y="0" width="180" height="22" rx="10" fill="#f2c94c" opacity="0.28"/>
+        </g>
+        <g transform="rotate(25)">
+        <rect x="-220" y="-10" width="420" height="22" rx="12" fill="#3e2a20" opacity="0.95"/>
+        <polygon points="200,-10 240,0 200,10" fill="#3e2a20"/>
+        <rect x="-220" y="0" width="180" height="22" rx="10" fill="#f2c94c" opacity="0.28"/>
+        </g>
+    </g>
+    <text x="600" y="1130" fontFamily="Segoe UI, Roboto, Arial, sans-serif" fontSize="34" fontWeight="600" textAnchor="middle" fill="#3b2a20">Escolha &amp; Consequência</text>
+    </svg>
+  );
+}

@@ -21,7 +21,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { BalanceIcon } from "@/components/icons";
+import { LogoIcon } from "@/components/logo-icon";
 import { Users, LogIn, BookOpenCheck, Repeat } from "lucide-react";
 import type { GameSettings } from "@/lib/types";
 
@@ -65,7 +65,7 @@ export default function GameSetupPage() {
       <Card className="w-full max-w-md shadow-lg">
         <CardHeader className="text-center">
           <div className="mx-auto mb-4 text-primary">
-            <BalanceIcon className="h-12 w-12" />
+            <LogoIcon className="h-24 w-24" />
           </div>
           <CardTitle className="font-headline text-3xl">Jogo da Decisão</CardTitle>
           <CardDescription>Configure sua partida e que comecem os jogos!</CardDescription>
