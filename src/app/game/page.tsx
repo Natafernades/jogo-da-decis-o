@@ -100,21 +100,20 @@ export default function GamePage() {
   const voterForCardPlayer = useMemo(() => players[voterForCardPlayerIndex], [players, voterForCardPlayerIndex]);
 
   const drawNewCard = () => {
-    // Tira a primeira carta do baralho embaralhado e a remove
     const [nextCard, ...restOfDeck] = shuffledDeck;
     
     if (nextCard) {
       setActiveCard(nextCard);
-      setShuffledDeck(restOfDeck); // Atualiza o baralho
+      setShuffledDeck(restOfDeck); // Atualiza o baralho sem reembaralhar
       setSelectedAnswer(null);
     } else {
-      // Se não houver mais cartas, podemos embaralhar novamente ou terminar o jogo
-      // Por agora, vamos reembaralhar
-      const newDeck = shuffleArray(CARDS);
-      const [newNextCard, ...newRest] = newDeck;
-      setActiveCard(newNextCard);
-      setShuffledDeck(newRest);
-      setSelectedAnswer(null);
+      // Se não houver mais cartas, encerra o modo de cartas.
+      // O jogo pode continuar no modo normal se houver rodadas restantes.
+      setActiveCard(null);
+      // Muda para a votação normal para o restante do jogo
+      setVoteStage('stage1');
+      setCurrentPlayerIndex(0);
+      setPlayerBeingVotedOnIndex(1 % (settings?.numPlayers || 1));
     }
   }
 
@@ -186,7 +185,7 @@ export default function GamePage() {
 
 
   const handleStage1Vote = (vote: 'assertive' | 'inassertive') => {
-    if(settings?.useOnlineCards) {
+    if(settings?.useOnlineCards && activeCard) {
       handleVoteOnCardPlayer('stage1', vote);
     } else {
       setCurrentVoteStage1(vote);
@@ -195,7 +194,7 @@ export default function GamePage() {
   };
 
   const handleStage2Vote = (vote: 'truth' | 'lie') => {
-    if(settings?.useOnlineCards) {
+    if(settings?.useOnlineCards && activeCard) {
       handleVoteOnCardPlayer('stage2', vote);
       return;
     }
@@ -325,8 +324,8 @@ export default function GamePage() {
   }
   
   // --- RENDER VOTING STAGES (FOR BOTH MODES) ---
-  const personVoting = settings.useOnlineCards ? voterForCardPlayer : currentPlayer;
-  const personBeingVotedOn = settings.useOnlineCards ? cardPlayer : playerBeingVotedOn;
+  const personVoting = settings.useOnlineCards && activeCard ? voterForCardPlayer : currentPlayer;
+  const personBeingVotedOn = settings.useOnlineCards && activeCard ? cardPlayer : playerBeingVotedOn;
 
   if (!personVoting || !personBeingVotedOn) {
      return (
@@ -421,5 +420,3 @@ export default function GamePage() {
     </div>
   );
 }
-
-    
