@@ -9,7 +9,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Home, Loader2, CheckCircle, XCircle, Award, Crown, User } from "lucide-react";
+import { Home, Loader2, CheckCircle, XCircle, User, Crown } from "lucide-react";
 import type { GameSettings, Player, VoteStage, StoredVote } from "@/lib/types";
 
 export default function GamePage() {
@@ -117,7 +117,7 @@ export default function GamePage() {
   return (
     <div className="flex flex-col min-h-screen items-center justify-center bg-background p-4 sm:p-6 lg:p-8">
       <div className="w-full max-w-2xl">
-        <header className="flex justify-between items-center mb-6">
+        <header className="flex justify-between items-center mb-4">
            <div className="flex items-center gap-3">
             <h1 className="text-3xl font-headline font-bold">Jogo da Decisão</h1>
             <span className="text-xl font-semibold text-muted-foreground">(Rodada {round}/{settings.numRounds})</span>
@@ -130,16 +130,16 @@ export default function GamePage() {
 
         <Card className="shadow-xl">
           <CardHeader>
-              <div className="space-y-2 text-center">
-                <p className="text-lg font-medium text-muted-foreground flex items-center justify-center gap-2"><Crown className="h-5 w-5 text-primary"/>Vez de jogar</p>
+              <div className="space-y-2 text-center mb-6">
+                <p className="text-lg font-medium text-muted-foreground flex items-center justify-center gap-2"><Crown className="h-5 w-5 text-primary"/>Jogador a votar</p>
                 <CardTitle className="text-4xl font-headline">{currentPlayer.name}</CardTitle>
               </div>
-              <div className="space-y-2 text-center mt-4">
-                <p className="text-lg font-medium text-muted-foreground flex items-center justify-center gap-2"><User className="h-5 w-5 text-rose-500"/>Sendo avaliado</p>
-                <p className="text-3xl font-bold">{playerBeingVotedOn.name}</p>
-              </div>
           </CardHeader>
-          <CardContent className="space-y-6 pt-6">
+          <CardContent className="space-y-6">
+            <div className="space-y-2 text-center -mt-4 mb-8">
+              <p className="text-lg font-medium text-muted-foreground flex items-center justify-center gap-2"><User className="h-5 w-5 text-rose-500"/>Sendo avaliado</p>
+              <p className="text-3xl font-bold">{playerBeingVotedOn.name}</p>
+            </div>
             <div className={`space-y-3 transition-opacity duration-300 ${voteStage !== 'stage1' ? 'opacity-30' : ''}`}>
               <h3 className="font-semibold text-lg flex items-center gap-2 justify-center">
                 Etapa 1: Classificação
