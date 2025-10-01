@@ -22,12 +22,13 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { BalanceIcon } from "@/components/icons";
-import { Users, LogIn, BookOpenCheck } from "lucide-react";
+import { Users, LogIn, BookOpenCheck, Repeat } from "lucide-react";
 import type { GameSettings } from "@/lib/types";
 
 export default function GameSetupPage() {
   const router = useRouter();
   const [numPlayers, setNumPlayers] = useState<number>(3);
+  const [numRounds, setNumRounds] = useState<number>(1);
   const [playerNames, setPlayerNames] = useState<{ [key: number]: string }>({});
   const [useOnlineCards, setUseOnlineCards] = useState(false);
 
@@ -36,19 +37,21 @@ export default function GameSetupPage() {
   };
 
   const isSetupComplete = useMemo(() => {
+    if (numRounds < 1) return false;
     for (let i = 0; i < numPlayers; i++) {
       if (!playerNames[i] || playerNames[i].trim() === "") {
         return false;
       }
     }
     return true;
-  }, [numPlayers, playerNames]);
+  }, [numPlayers, numRounds, playerNames]);
   
   const handleStartGame = () => {
     if (!isSetupComplete) return;
 
     const settings: GameSettings = {
       numPlayers,
+      numRounds,
       useOnlineCards,
       playerNames,
     };
@@ -68,26 +71,41 @@ export default function GameSetupPage() {
           <CardDescription>Configure sua partida e que comecem os jogos!</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          <div className="space-y-2">
-            <Label htmlFor="num-players" className="flex items-center gap-2">
-              <Users className="h-4 w-4" />
-              Número de Jogadores
-            </Label>
-            <Select
-              value={String(numPlayers)}
-              onValueChange={(value) => setNumPlayers(Number(value))}
-            >
-              <SelectTrigger id="num-players">
-                <SelectValue placeholder="Selecione o número de jogadores" />
-              </SelectTrigger>
-              <SelectContent>
-                {Array.from({ length: 12 }, (_, i) => i + 1).map((num) => (
-                  <SelectItem key={num} value={String(num)}>
-                    {num} Jogador{num > 1 ? "es" : ""}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="num-players" className="flex items-center gap-2">
+                <Users className="h-4 w-4" />
+                Jogadores
+              </Label>
+              <Select
+                value={String(numPlayers)}
+                onValueChange={(value) => setNumPlayers(Number(value))}
+              >
+                <SelectTrigger id="num-players">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {Array.from({ length: 12 }, (_, i) => i + 1).map((num) => (
+                    <SelectItem key={num} value={String(num)}>
+                      {num} Jogador{num > 1 ? "es" : ""}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+             <div className="space-y-2">
+              <Label htmlFor="num-rounds" className="flex items-center gap-2">
+                <Repeat className="h-4 w-4" />
+                Rodadas
+              </Label>
+              <Input
+                id="num-rounds"
+                type="number"
+                value={numRounds}
+                onChange={(e) => setNumRounds(Math.max(1, parseInt(e.target.value) || 1))}
+                min="1"
+              />
+            </div>
           </div>
 
           <div className="flex items-center justify-between rounded-lg border p-3 shadow-sm bg-muted/50">
