@@ -3,7 +3,7 @@ export interface Player {
   name: string;
 }
 
-export type VoteStage = 'stage1' | 'stage2' | 'finished';
+export type VoteStage = 'cardSelection' | 'stage1' | 'stage2' | 'finished';
 
 export type StoredVote = {
   round: number;
@@ -18,4 +18,15 @@ export interface GameSettings {
   numRounds: number;
   useOnlineCards: boolean;
   playerNames: { [key: number]: string };
+}
+
+export interface CardAnswer {
+  text: string;
+  color: 'azul' | 'vermelha';
+}
+
+export interface GameCard {
+  theme: string;
+  question: string;
+  answers: CardAnswer[];
 }

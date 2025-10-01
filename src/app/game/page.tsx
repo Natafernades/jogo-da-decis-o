@@ -10,9 +10,10 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Home, Loader2, CheckCircle, XCircle, User, Crown } from "lucide-react";
-import type { GameSettings, Player, VoteStage, StoredVote } from "@/lib/types";
+import { Home, Loader2, CheckCircle, XCircle, User, Crown, HelpCircle } from "lucide-react";
+import type { GameSettings, Player, VoteStage, StoredVote, GameCard } from "@/lib/types";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
+import { CARDS } from "@/lib/cards";
 
 
 export default function GamePage() {
@@ -28,6 +29,12 @@ export default function GamePage() {
   const [currentVoteStage1, setCurrentVoteStage1] = useState<'assertive' | 'inassertive' | null>(null);
   const [voteStage, setVoteStage] = useState<VoteStage>('stage1');
   const adBanner = useMemo(() => PlaceHolderImages.find(img => img.id === 'paid-ad-banner'), []);
+  
+  // Card game state
+  const [activeCard, setActiveCard] = useState<GameCard | null>(null);
+  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
+  const [cardPlayerIndex, setCardPlayerIndex] = useState(0); // Player who draws a card
+  const [voterForCardPlayerIndex, setVoterForCardPlayerIndex] = useState(1); // Player who votes on the card player
 
 
   useEffect(() => {
@@ -45,21 +52,105 @@ export default function GamePage() {
     }));
     setPlayers(initialPlayers);
 
-    // Initial voter is player 0, person being voted on is player 1
-    setCurrentPlayerIndex(0);
-    setPlayerBeingVotedOnIndex(1 % parsedSettings.numPlayers);
+    if(parsedSettings.useOnlineCards) {
+      setVoteStage('cardSelection');
+      setCardPlayerIndex(0);
+      drawNewCard();
+    } else {
+      // Initial voter is player 0, person being voted on is player 1
+      setCurrentPlayerIndex(0);
+      setPlayerBeingVotedOnIndex(1 % parsedSettings.numPlayers);
+    }
 
   }, [router]);
 
+  // --- Regular Game Logic ---
   const currentPlayer = useMemo(() => players[currentPlayerIndex], [players, currentPlayerIndex]);
   const playerBeingVotedOn = useMemo(() => players[playerBeingVotedOnIndex], [players, playerBeingVotedOnIndex]);
 
+  // --- Card Game Logic ---
+  const cardPlayer = useMemo(() => players[cardPlayerIndex], [players, cardPlayerIndex]);
+  const voterForCardPlayer = useMemo(() => players[voterForCardPlayerIndex], [players, voterForCardPlayerIndex]);
+
+  const drawNewCard = () => {
+    const randomIndex = Math.floor(Math.random() * CARDS.length);
+    setActiveCard(CARDS[randomIndex]);
+    setSelectedAnswer(null);
+  }
+
+  const handleSelectAnswer = (answerText: string) => {
+    setSelectedAnswer(answerText);
+    setVoteStage('stage1');
+    setVoterForCardPlayerIndex((cardPlayerIndex + 1) % players.length);
+  }
+
+  const handleVoteOnCardPlayer = (stage: 'stage1' | 'stage2', vote: 'assertive' | 'inassertive' | 'truth' | 'lie') => {
+     if (!settings) return;
+
+    if (stage === 'stage1') {
+      setCurrentVoteStage1(vote as 'assertive' | 'inassertive');
+      setVoteStage('stage2');
+      return;
+    }
+
+    // Stage 2
+    if (!currentVoteStage1) return;
+    const newVote: StoredVote = {
+      round,
+      voterId: voterForCardPlayer.id,
+      votedOnId: cardPlayer.id, // The person being voted on is the one who chose the card answer
+      stage1: currentVoteStage1,
+      stage2: vote as 'truth' | 'lie',
+    };
+    setAllVotes(prev => [...prev, newVote]);
+    
+    // Reset for next voter
+    setCurrentVoteStage1(null);
+    setVoteStage('stage1');
+    
+    const nextVoterIndex = (voterForCardPlayerIndex + 1) % players.length;
+    
+    // Check if everyone has voted on the current card player
+    if (nextVoterIndex === cardPlayerIndex) {
+      // End of voting for this card. Move to the next player to draw a card.
+      const nextCardPlayerIndex = (cardPlayerIndex + 1) % players.length;
+
+      // Check for end of round
+      if (nextCardPlayerIndex === 0) {
+        if (round + 1 > settings.numRounds) {
+          // GAME OVER
+          localStorage.setItem('gameResults', JSON.stringify({ players, votes: [...allVotes, newVote] }));
+          router.push('/results');
+          return;
+        }
+        setRound(r => r + 1);
+      }
+      
+      setCardPlayerIndex(nextCardPlayerIndex);
+      setVoteStage('cardSelection');
+      drawNewCard();
+    } else {
+      // Just move to the next voter
+      setVoterForCardPlayerIndex(nextVoterIndex);
+    }
+  };
+
+
   const handleStage1Vote = (vote: 'assertive' | 'inassertive') => {
-    setCurrentVoteStage1(vote);
-    setVoteStage('stage2');
+    if(settings?.useOnlineCards) {
+      handleVoteOnCardPlayer('stage1', vote);
+    } else {
+      setCurrentVoteStage1(vote);
+      setVoteStage('stage2');
+    }
   };
 
   const handleStage2Vote = (vote: 'truth' | 'lie') => {
+    if(settings?.useOnlineCards) {
+      handleVoteOnCardPlayer('stage2', vote);
+      return;
+    }
+
     if (!currentVoteStage1 || !settings) return;
 
     const newVote: StoredVote = {
@@ -78,20 +169,15 @@ export default function GamePage() {
     // --- Advance Logic ---
     let nextVoterIndex = (currentPlayerIndex + 1) % players.length;
     
-    // Skip the player who is currently being voted on
     if (nextVoterIndex === playerBeingVotedOnIndex) {
       nextVoterIndex = (nextVoterIndex + 1) % players.length;
     }
 
-    // Check if a full voting cycle for this player is complete
     if (nextVoterIndex === (playerBeingVotedOnIndex + 1) % players.length) {
-      // All players have voted on the current target, move to the next target
       const nextPlayerBeingVotedOnIndex = (playerBeingVotedOnIndex + 1) % players.length;
       
-      // Check for end of round
-      if (nextPlayerBeingVotedOnIndex === 0) { // Completed a full round of everyone being voted on
+      if (nextPlayerBeingVotedOnIndex === 0) { 
         if(round + 1 > settings.numRounds) {
-          // GAME OVER
           localStorage.setItem('gameResults', JSON.stringify({ players, votes: [...allVotes, newVote] }));
           router.push('/results');
           return;
@@ -100,25 +186,99 @@ export default function GamePage() {
       }
       
       setPlayerBeingVotedOnIndex(nextPlayerBeingVotedOnIndex);
-      // The new voter is the player after the newly selected "voted on" player
-      let newVoterIndex = (nextPlayerBeingVotedOnIndex + 1) % players.length;
-      setCurrentPlayerIndex(newVoterIndex);
+      setCurrentPlayerIndex((nextPlayerBeingVotedOnIndex + 1) % players.length);
 
     } else {
-      // Just move to the next voter
       setCurrentPlayerIndex(nextVoterIndex);
     }
   };
   
-  if (!settings || !currentPlayer || !playerBeingVotedOn) {
+  if (!settings || players.length === 0) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
         <Loader2 className="h-12 w-12 animate-spin text-primary" />
       </div>
     );
   }
+
+  // --- RENDER CARD SELECTION ---
+  if (settings.useOnlineCards && voteStage === 'cardSelection' && activeCard && cardPlayer) {
+    return (
+      <div className="flex flex-col min-h-screen bg-background">
+        <div className="flex-grow flex flex-col items-center justify-center p-4 sm:p-6 lg:p-8">
+            <div className="w-full max-w-2xl">
+              <header className="flex justify-between items-center mb-4">
+                 <div className="flex items-center gap-3">
+                    <h1 className="text-3xl font-headline font-bold">Jogo da Decisão</h1>
+                    <span className="text-xl font-semibold text-muted-foreground">(Rodada {round}/{settings.numRounds})</span>
+                </div>
+                <Button variant="ghost" size="icon" onClick={() => router.push('/')}>
+                  <Home className="h-5 w-5"/>
+                  <span className="sr-only">Voltar ao início</span>
+                </Button>
+              </header>
+
+              <Card className="shadow-xl">
+                <CardHeader>
+                    <div className="space-y-2 text-center mb-6">
+                        <p className="text-lg font-medium text-muted-foreground flex items-center justify-center gap-2"><Crown className="h-5 w-5 text-primary"/>Jogador a escolher</p>
+                        <CardTitle className="text-4xl font-headline">{cardPlayer.name}</CardTitle>
+                    </div>
+                </CardHeader>
+                <CardContent className="space-y-6 text-center">
+                    <p className="font-bold text-xl">{activeCard.theme}</p>
+                    <p className="text-2xl font-semibold"><HelpCircle className="inline h-6 w-6 mr-2 text-muted-foreground"/>{activeCard.question}</p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
+                        {activeCard.answers.map((ans, idx) => (
+                            <Button
+                                key={idx}
+                                size="lg"
+                                className={`h-24 text-lg flex-col gap-1 ${ans.color === 'azul' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-red-600 hover:bg-red-700'} text-white`}
+                                onClick={() => handleSelectAnswer(ans.text)}
+                            >
+                                {ans.text}
+                            </Button>
+                        ))}
+                    </div>
+                </CardContent>
+              </Card>
+            </div>
+        </div>
+        <footer className="w-full p-4 mt-auto">
+            <div className="container mx-auto text-center text-xs text-muted-foreground">
+              <p>Propaganda Remunerada</p>
+              {adBanner && (
+                <div className="mt-2 flex justify-center">
+                  <a href="#" target="_blank" rel="noopener noreferrer">
+                    <Image
+                      src={adBanner.imageUrl}
+                      alt={adBanner.description}
+                      width={728}
+                      height={90}
+                      data-ai-hint={adBanner.imageHint}
+                      className="rounded-lg"
+                    />
+                  </a>
+                </div>
+              )}
+            </div>
+        </footer>
+      </div>
+    );
+  }
   
-  // Simple layout to avoid scrolling
+  // --- RENDER VOTING STAGES (FOR BOTH MODES) ---
+  const personVoting = settings.useOnlineCards ? voterForCardPlayer : currentPlayer;
+  const personBeingVotedOn = settings.useOnlineCards ? cardPlayer : playerBeingVotedOn;
+
+  if (!personVoting || !personBeingVotedOn) {
+     return (
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <Loader2 className="h-12 w-12 animate-spin text-primary" />
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <div className="flex-grow flex flex-col items-center justify-center p-4 sm:p-6 lg:p-8">
@@ -136,16 +296,20 @@ export default function GamePage() {
 
           <Card className="shadow-xl">
             <CardHeader>
-              <div className="space-y-2 text-center mb-6">
-                <p className="text-lg font-medium text-muted-foreground flex items-center justify-center gap-2"><Crown className="h-5 w-5 text-primary"/>Jogador a votar</p>
-                <CardTitle className="text-4xl font-headline">{currentPlayer.name}</CardTitle>
-              </div>
+                <div className="space-y-2 text-center -mt-4 mb-8">
+                    <p className="text-lg font-medium text-muted-foreground flex items-center justify-center gap-2"><User className="h-5 w-5 text-rose-500"/>Sendo avaliado</p>
+                    <p className="text-3xl font-bold">{personBeingVotedOn.name}</p>
+                    {settings.useOnlineCards && selectedAnswer && (
+                      <blockquote className="text-xl italic border-l-4 pl-4 mt-2">"{selectedAnswer}"</blockquote>
+                    )}
+                </div>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="space-y-2 text-center -mt-4 mb-8">
-                <p className="text-lg font-medium text-muted-foreground flex items-center justify-center gap-2"><User className="h-5 w-5 text-rose-500"/>Sendo avaliado</p>
-                <p className="text-3xl font-bold">{playerBeingVotedOn.name}</p>
+              <div className="space-y-2 text-center mb-6">
+                <p className="text-lg font-medium text-muted-foreground flex items-center justify-center gap-2"><Crown className="h-5 w-5 text-primary"/>Jogador a votar</p>
+                <CardTitle className="text-4xl font-headline">{personVoting.name}</CardTitle>
               </div>
+
               <div className={`space-y-3 transition-opacity duration-300 ${voteStage !== 'stage1' ? 'opacity-30' : ''}`}>
                 <h3 className="font-semibold text-lg flex items-center gap-2 justify-center">
                   Etapa 1: Classificação
