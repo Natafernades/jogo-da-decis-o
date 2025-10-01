@@ -2,6 +2,8 @@
 
 import { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 import {
   Card,
   CardContent,
@@ -10,7 +12,7 @@ import {
   CardDescription
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, Home, BarChart } from 'lucide-react';
+import { Loader2, Home, BarChart, Download } from 'lucide-react';
 import type { Player, StoredVote, GameResults } from '@/lib/types';
 import {
   Table,
@@ -66,6 +68,7 @@ export default function ResultsPage() {
   const router = useRouter();
   const [results, setResults] = useState<PlayerStats[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isDownloading, setIsDownloading] = useState(false);
 
   useEffect(() => {
     const resultsData = localStorage.getItem('gameResults');
@@ -114,6 +117,37 @@ export default function ResultsPage() {
     router.push('/');
   }
 
+  const handleDownloadPDF = async () => {
+    const resultsCard = document.getElementById('results-card');
+    if (!resultsCard) return;
+
+    setIsDownloading(true);
+
+    try {
+        const canvas = await html2canvas(resultsCard, {
+            scale: 2, // Aumenta a resolução para melhor qualidade
+            useCORS: true, 
+            backgroundColor: null // Fundo transparente para o canvas
+        });
+        const imgData = canvas.toDataURL('image/png');
+        
+        // Ajusta as dimensões do PDF para o conteúdo
+        const pdf = new jsPDF({
+            orientation: 'landscape',
+            unit: 'px',
+            format: [canvas.width, canvas.height]
+        });
+
+        pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+        pdf.save('resultado-jogo-da-decisao.pdf');
+    } catch (error) {
+        console.error("Erro ao gerar PDF:", error);
+    } finally {
+        setIsDownloading(false);
+    }
+  };
+
+
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
@@ -124,7 +158,7 @@ export default function ResultsPage() {
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-4 sm:p-6 md:p-8 bg-background">
-      <Card className="w-full max-w-6xl shadow-lg">
+      <Card className="w-full max-w-6xl shadow-lg" id="results-card">
         <CardHeader className="text-center">
             <div className="mx-auto mb-4 text-primary">
                 <BarChart className="h-14 w-14" />
@@ -166,13 +200,21 @@ export default function ResultsPage() {
                 </Table>
             </div>
         </CardContent>
-        <CardContent className="flex justify-center pt-6">
+        </Card>
+        <div className="flex justify-center items-center gap-4 mt-6">
            <Button onClick={handlePlayAgain}>
                 <Home className="mr-2 h-4 w-4" />
                 Jogar Novamente
             </Button>
-        </CardContent>
-      </Card>
+            <Button onClick={handleDownloadPDF} disabled={isDownloading}>
+                {isDownloading ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                    <Download className="mr-2 h-4 w-4" />
+                )}
+                Baixar Resultado (PDF)
+            </Button>
+        </div>
     </main>
   );
 }
