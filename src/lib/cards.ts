@@ -170,7 +170,7 @@ export const CARDS: GameCard[] = [
 },
 // MEDO
 {
-  tema: "Medo",
+  theme: "Medo",
   question: "Você precisa encarar uma entrevista importante.",
   answers: [
     { text: "Treina antes e respira para se acalmar.", color: "azul" },
@@ -181,7 +181,7 @@ export const CARDS: GameCard[] = [
 },
 // PERDA
 {
-  tema: "Perda",
+  theme: "Perda",
   question: "Você perde um grande investimento financeiro.",
   answers: [
     { text: "Reavalia os erros e busca alternativas.", color: "azul" },
@@ -192,7 +192,7 @@ export const CARDS: GameCard[] = [
 },
 // FAMÍLIA
 {
-  tema: "Família",
+  theme: "Família",
   question: "Um parente pede dinheiro que você não pode emprestar.",
   answers: [
     { text: "Explica seus limites financeiros.", color: "azul" },
@@ -203,7 +203,7 @@ export const CARDS: GameCard[] = [
 },
 // AJUDA
 {
-  tema: "Ajuda",
+  theme: "Ajuda",
   question: "Um amigo pede ajuda para mudar de casa no mesmo dia que você tinha compromissos.",
   answers: [
     { text: "Explica que pode ajudar em outro horário.", color: "azul" },
@@ -214,7 +214,7 @@ export const CARDS: GameCard[] = [
 },
 // TRAIÇÃO
 {
-  tema: "Traição",
+  theme: "Traição",
   question: "Você descobre que um colega escondeu informações para se beneficiar.",
   answers: [
     { text: "Confronta e pede transparência.", color: "azul" },
@@ -225,7 +225,7 @@ export const CARDS: GameCard[] = [
 },
 // SUPERAÇÃO
 {
-  tema: "Superação",
+  theme: "Superação",
   question: "Você não passou em uma prova importante.",
   answers: [
     { text: "Revê o conteúdo e tenta novamente.", color: "azul" },
@@ -236,7 +236,7 @@ export const CARDS: GameCard[] = [
 },
 // VÍCIO
 {
-  tema: "Vício",
+  theme: "Vício",
   question: "Você percebe que está usando muito o celular e perdendo foco.",
   answers: [
     { text: "Define limites de tempo e cumpre.", color: "azul" },
@@ -247,7 +247,7 @@ export const CARDS: GameCard[] = [
 },
 // INJUSTIÇA
 {
-  tema: "Injustiça",
+  theme: "Injustiça",
   question: "Um colega de equipe é elogiado pelo que você fez.",
   answers: [
     { text: "Mostra as evidências do seu esforço.", color: "azul" },
@@ -258,7 +258,7 @@ export const CARDS: GameCard[] = [
 },
 // LIBERDADE
 {
-  tema: "Liberdade",
+  theme: "Liberdade",
   question: "Um parceiro tenta decidir todas as suas escolhas.",
   answers: [
     { text: "Mostra seus limites de forma firme.", color: "azul" },
@@ -269,7 +269,7 @@ export const CARDS: GameCard[] = [
 },
 // DOENÇA
 {
-  tema: "Doença",
+  theme: "Doença",
   question: "Você está sentindo sintomas preocupantes.",
   answers: [
     { text: "Procura um médico imediatamente.", color: "azul" },
@@ -280,7 +280,7 @@ export const CARDS: GameCard[] = [
 },
 // CULPA
 {
-  tema: "Culpa",
+  theme: "Culpa",
   question: "Você esqueceu um compromisso importante.",
   answers: [
     { text: "Admite o erro e pede desculpas.", color: "azul" },
@@ -291,13 +291,158 @@ export const CARDS: GameCard[] = [
 },
 // AMIZADE
 {
-  tema: "Amizade",
+  theme: "Amizade",
   question: "Seu amigo não respondeu mensagens por dias.",
   answers: [
     { text: "Conversa para entender o que houve.", color: "azul" },
     { text: "Respeita o espaço e espera o momento certo.", color: "azul" },
     { text: "Fica com raiva e corta a amizade.", color: "vermelha" },
     { text: "Faz indiretas para provocar.", color: "vermelha" }
+  ]
+},
+// ======== CARTAS NOVAS DIFERENTES ========
+
+// TRABALHO
+{
+  theme: "Trabalho",
+  question: "Seu chefe faz uma crítica em público sobre você.",
+  answers: [
+    { text: "Escuta e depois busca feedback construtivo.", color: "azul" },
+    { text: "Pergunta calmamente como pode melhorar.", color: "azul" },
+    { text: "Fica em silêncio e se sente humilhado.", color: "vermelha" },
+    { text: "Responde na hora com agressividade.", color: "vermelha" }
+  ]
+},
+// MEDO
+{
+  theme: "Medo",
+  question: "Você precisa tomar uma decisão rápida e tem medo de errar.",
+  answers: [
+    { text: "Respira fundo e avalia o que pode ser controlado.", color: "azul" },
+    { text: "Decide baseado em valores pessoais.", color: "azul" },
+    { text: "Paralisa e deixa os outros decidirem.", color: "vermelha" },
+    { text: "Escolhe qualquer opção só para acabar logo.", color: "vermelha" }
+  ]
+},
+// PERDA
+{
+  theme: "Perda",
+  question: "Você perdeu uma oportunidade de emprego.",
+  answers: [
+    { text: "Refaz seu currículo e continua tentando.", color: "azul" },
+    { text: "Aprende com a experiência e se prepara melhor.", color: "azul" },
+    { text: "Se culpa e pensa que não tem capacidade.", color: "vermelha" },
+    { text: "Desiste de procurar novas vagas.", color: "vermelha" }
+  ]
+},
+// FAMÍLIA
+{
+  theme: "Família",
+  question: "Um parente sempre interfere nas suas escolhas.",
+  answers: [
+    { text: "Coloca limites com firmeza, mas respeito.", color: "azul" },
+    { text: "Explica que precisa de autonomia.", color: "azul" },
+    { text: "Aceita calado mesmo insatisfeito.", color: "vermelha" },
+    { text: "Briga e rompe laços familiares.", color: "vermelha" }
+  ]
+},
+// AJUDA
+{
+  theme: "Ajuda",
+  question: "Você percebe alguém passando mal na rua.",
+  answers: [
+    { text: "Se aproxima e oferece ajuda imediata.", color: "azul" },
+    { text: "Chama profissionais de socorro.", color: "azul" },
+    { text: "Finge que não viu e segue.", color: "vermelha" },
+    { text: "Filma a cena para postar em rede social.", color: "vermelha" }
+  ]
+},
+// TRAIÇÃO
+{
+  theme: "Traição",
+  question: "Você descobre que seu parceiro compartilhou segredos seus.",
+  answers: [
+    { text: "Conversa sobre como se sentiu traído.", color: "azul" },
+    { text: "Define se ainda há confiança no relacionamento.", color: "azul" },
+    { text: "Guarda rancor e planeja vingança.", color: "vermelha" },
+    { text: "Expõe os segredos dele para se vingar.", color: "vermelha" }
+  ]
+},
+// SUPERAÇÃO
+{
+  theme: "Superação",
+  question: "Você falhou em uma meta pessoal.",
+  answers: [
+    { text: "Refaz seu planejamento e ajusta a estratégia.", color: "azul" },
+    { text: "Procura inspiração em quem já conseguiu.", color: "azul" },
+    { text: "Desiste e se sente incapaz.", color: "vermelha" },
+    { text: "Culpa os outros por sua falha.", color: "vermelha" }
+  ]
+},
+// VÍCIO
+{
+  theme: "Vício",
+  question: "Você percebe que está gastando muito dinheiro em compras impulsivas.",
+  answers: [
+    { text: "Cria um limite de gastos e segue.", color: "azul" },
+    { text: "Procura alternativas saudáveis para lidar com emoções.", color: "azul" },
+    { text: "Continua comprando e se endividando.", color: "vermelha" },
+    { text: "Esconde dívidas da família.", color: "vermelha" }
+  ]
+},
+// INJUSTIÇA
+{
+  theme: "Injustiça",
+  question: "Você vê um colega ser punido por algo que não fez.",
+  answers: [
+    { text: "Defende o colega com base na verdade.", color: "azul" },
+    { text: "Leva o caso ao responsável justo.", color: "azul" },
+    { text: "Fica quieto para não se envolver.", color: "vermelha" },
+    { text: "Apoia a punição por conveniência.", color: "vermelha" }
+  ]
+},
+// LIBERDADE
+{
+  theme: "Liberdade",
+  question: "Um chefe tenta controlar até sua vida pessoal.",
+  answers: [
+    { text: "Mostra que sua vida pessoal é sua escolha.", color: "azul" },
+    { text: "Busca apoio formal para colocar limites.", color: "azul" },
+    { text: "Aceita e obedece sem questionar.", color: "vermelha" },
+    { text: "Responde de forma explosiva.", color: "vermelha" }
+  ]
+},
+// DOENÇA
+{
+  theme: "Doença",
+  question: "Você precisa fazer um tratamento longo.",
+  answers: [
+    { text: "Segue corretamente as recomendações médicas.", color: "azul" },
+    { text: "Mantém fé e motivação para se recuperar.", color: "azul" },
+    { text: "Abandona o tratamento por preguiça.", color: "vermelha" },
+    { text: "Nega a doença e não faz nada.", color: "vermelha" }
+  ]
+},
+// CULPA
+{
+  theme: "Culpa",
+  question: "Você falou algo sem pensar e magoou alguém.",
+  answers: [
+    { text: "Reconhece o erro e pede desculpa.", color: "azul" },
+    { text: "Se compromete a agir diferente.", color: "azul" },
+    { text: "Finge que nada aconteceu.", color: "vermelha" },
+    { text: "Culpa a outra pessoa pela reação.", color: "vermelha" }
+  ]
+},
+// AMIZADE
+{
+  theme: "Amizade",
+  question: "Seu amigo pede algo que vai contra seus valores.",
+  answers: [
+    { text: "Explica seus valores e se mantém firme.", color: "azul" },
+    { text: "Oferece uma alternativa saudável.", color: "azul" },
+    { text: "Aceita para não perder a amizade.", color: "vermelha" },
+    { text: "Cede e depois guarda rancor.", color: "vermelha" }
   ]
 }
 ];
