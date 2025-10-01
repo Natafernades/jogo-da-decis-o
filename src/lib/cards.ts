@@ -182,7 +182,7 @@ export const CARDS: GameCard[] = [
 // PERDA
 {
   theme: "Perda",
-  question: "Você perde um grande investimento financeiro.",
+  question: "Você perdeu um grande investimento financeiro.",
   answers: [
     { text: "Reavalia os erros e busca alternativas.", color: "azul" },
     { text: "Conversa com especialistas para melhorar.", color: "azul" },
@@ -589,7 +589,154 @@ export const CARDS: GameCard[] = [
     { text: "Empresta mesmo sabendo que vai se complicar.", color: "vermelha" },
     { text: "Recusa com rispidez.", color: "vermelha" }
   ]
+},
+// ======== CARTAS PACOTE 5 — DIFERENTES ========
+
+// TRABALHO
+{
+  theme: "Trabalho",
+  question: "Um colega assume o crédito de uma ideia que foi sua.",
+  answers: [
+    { text: "Conversa com ele em particular para esclarecer.", color: "azul" },
+    { text: "Leva o caso ao gestor com maturidade.", color: "azul" },
+    { text: "Ignora e guarda rancor em silêncio.", color: "vermelha" },
+    { text: "Expõe ele na frente de todos com raiva.", color: "vermelha" }
+  ]
+},
+// MEDO
+{
+  theme: "Medo",
+  question: "Você precisa viajar sozinho para um lugar desconhecido.",
+  answers: [
+    { text: "Planeja com antecedência e pesquisa o destino.", color: "azul" },
+    { text: "Pede dicas a pessoas experientes.", color: "azul" },
+    { text: "Desiste por medo do novo.", color: "vermelha" },
+    { text: "Vai sem preparo e se arrisca desnecessariamente.", color: "vermelha" }
+  ]
+},
+// PERDA
+{
+  theme: "Perda",
+  question: "Você perdeu um objeto de valor no transporte público.",
+  answers: [
+    { text: "Aceita a perda e registra ocorrência.", color: "azul" },
+    { text: "Aprende a cuidar mais dos pertences.", color: "azul" },
+    { text: "Se desespera e culpa todos à sua volta.", color: "vermelha" },
+    { text: "Passa dias remoendo sem agir.", color: "vermelha" }
+  ]
+},
+// FAMÍLIA
+{
+  theme: "Família",
+  question: "Um parente mais velho precisa de cuidados constantes.",
+  answers: [
+    { text: "Organiza a família para dividir responsabilidades.", color: "azul" },
+    { text: "Oferece apoio emocional e presença.", color: "azul" },
+    { text: "Ignora e finge que não é sua obrigação.", color: "vermelha" },
+    { text: "Reclama constantemente sem ajudar de fato.", color: "vermelha" }
+  ]
+},
+// AJUDA
+{
+  theme: "Ajuda",
+  question: "Um desconhecido pede uma informação na rua.",
+  answers: [
+    { text: "Explica com calma ou indica no celular.", color: "azul" },
+    { text: "Acompanha parte do caminho para facilitar.", color: "azul" },
+    { text: "Ignora e segue sem responder.", color: "vermelha" },
+    { text: "Responde de forma ríspida.", color: "vermelha" }
+  ]
+},
+// TRAIÇÃO
+{
+  theme: "Traição",
+  question: "Um colega de equipe compartilha dados confidenciais.",
+  answers: [
+    { text: "Confronta com firmeza e pede explicação.", color: "azul" },
+    { text: "Relata a situação ao responsável com provas.", color: "azul" },
+    { text: "Espalha fofocas sobre ele.", color: "vermelha" },
+    { text: "Finge que não viu para evitar conflito.", color: "vermelha" }
+  ]
+},
+// SUPERAÇÃO
+{
+  theme: "Superação",
+  question: "Você não passou em um exame importante.",
+  answers: [
+    { text: "Analisa os erros e cria um novo plano de estudo.", color: "azul" },
+    { text: "Mantém a disciplina e tenta novamente.", color: "azul" },
+    { text: "Desiste achando que não tem capacidade.", color: "vermelha" },
+    { text: "Culpa os outros por sua reprovação.", color: "vermelha" }
+  ]
+},
+// VÍCIO
+{
+  theme: "Vício",
+  question: "Você percebe que está dependente de café para funcionar.",
+  answers: [
+    { text: "Reduz o consumo e substitui por água/descanso.", color: "azul" },
+    { text: "Procura alternativas saudáveis para manter energia.", color: "azul" },
+    { text: "Ignora os efeitos e continua exagerando.", color: "vermelha" },
+    { text: "Se gaba do excesso como se fosse algo bom.", color: "vermelha" }
+  ]
+},
+// INJUSTIÇA
+{
+  theme: "Injustiça",
+  question: "Seu colega foi promovido de forma desleal.",
+  answers: [
+    { text: "Conversa com o gestor sobre critérios de promoção.", color: "azul" },
+    { text: "Busca melhorar seu desempenho e ser reconhecido.", color: "azul" },
+    { text: "Se revolta e fala mal dele pelas costas.", color: "vermelha" },
+    { text: "Desiste de se esforçar no trabalho.", color: "vermelha" }
+  ]
+},
+// LIBERDADE
+{
+  theme: "Liberdade",
+  question: "Você deseja seguir uma carreira diferente da esperada por sua família.",
+  answers: [
+    { text: "Explica sua escolha com maturidade.", color: "azul" },
+    { text: "Mostra comprometimento com a nova carreira.", color: "azul" },
+    { text: "Obedece apenas para agradar os outros.", color: "vermelha" },
+    { text: "Se revolta e rompe relações sem diálogo.", color: "vermelha" }
+  ]
+},
+// DOENÇA
+{
+  theme: "Doença",
+  question: "Você recebe um diagnóstico difícil.",
+  answers: [
+    { text: "Segue o tratamento indicado.", color: "azul" },
+    { text: "Busca apoio emocional e familiar.", color: "azul" },
+    { text: "Nega a realidade e não faz nada.", color: "vermelha" },
+    { text: "Se isola sem procurar ajuda.", color: "vermelha" }
+  ]
+},
+// CULPA
+{
+  theme: "Culpa",
+  question: "Você prometeu algo e não cumpriu.",
+  answers: [
+    { text: "Reconhece e pede desculpas.", color: "azul" },
+    { text: "Compensa de outra forma.", color: "azul" },
+    { text: "Finge que não aconteceu nada.", color: "vermelha" },
+    { text: "Culpa a outra pessoa pelo erro.", color: "vermelha" }
+  ]
+},
+// AMIZADE
+{
+  theme: "Amizade",
+  question: "Seu amigo começou a agir de forma distante.",
+  answers: [
+    { text: "Conversa para entender o que está acontecendo.", color: "azul" },
+    { text: "Mostra apoio mesmo à distância.", color: "azul" },
+    { text: "Cria boatos achando que ele não gosta mais de você.", color: "vermelha" },
+    { text: "Ignora e rompe a amizade sem diálogo.", color: "vermelha" }
+  ]
 }
 ];
+
+    
 
     
