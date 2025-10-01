@@ -11,6 +11,7 @@ const alegreya = Alegreya({
 export const metadata: Metadata = {
   title: 'Jogo da Decisão',
   description: 'Um jogo de estratégia, votação e decisões difíceis.',
+  manifest: '/manifest.json',
 };
 
 export default function RootLayout({
