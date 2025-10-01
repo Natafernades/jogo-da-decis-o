@@ -120,7 +120,7 @@ export default function GamePage() {
     
     if (settings.useOnlineCards) {
       // Draw a new card for the next player
-      const nextCardIndex = Math.floor(allVotes.filter(v => v.cardAnswer !== undefined).length / (players.length > 1 ? players.length - 1 : 1));
+      const nextCardIndex = newEvaluatedPlayerCount;
       if (nextCardIndex < shuffledDeck.length) {
         setActiveCard(shuffledDeck[nextCardIndex]);
         setGameStage('card_selection');
@@ -137,7 +137,7 @@ export default function GamePage() {
         let nextVoter = (nextPlayerBeingVotedOnIndex + 1) % players.length;
         setCurrentPlayerIndex(nextVoter);
     }
-  }, [settings, evaluatedPlayerCount, players, playerBeingVotedOnIndex, round, endGame, allVotes, shuffledDeck]);
+  }, [settings, evaluatedPlayerCount, players, playerBeingVotedOn, playerBeingVotedOnIndex, round, endGame, shuffledDeck]);
 
   const handleSelectCardAnswer = useCallback((answerText: string) => {
     setSelectedAnswer(answerText);
@@ -357,3 +357,5 @@ export default function GamePage() {
     </div>
   );
 }
+
+    
