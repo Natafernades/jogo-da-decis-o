@@ -87,7 +87,7 @@ export default function GamePage() {
 
   const endGame = () => {
     localStorage.setItem('gameResults', JSON.stringify({ players, votes: allVotes, armWrestlingVotes }));
-    router.push('/results');
+    router.push('/pre-results');
   };
   
   const currentPlayer = useMemo(() => players[currentPlayerIndex], [players, currentPlayerIndex]);
