@@ -3,9 +3,17 @@ export interface Player {
   name: string;
 }
 
-export type GameStage = 'card_selection' | 'voting' | 'finished';
+export type GameStage = 'card_selection' | 'voting' | 'finished' | 'arm_wrestling_selection' | 'arm_wrestling_voting';
 
 export type VoteStage = 'stage1' | 'stage2';
+
+export type ArmWrestlingVote = {
+  round: number;
+  voterId: string;
+  challenger1Id: string; // The player who chose the opponent
+  challenger2Id: string; // The chosen opponent
+  votedForWinnerId: string;
+}
 
 export type StoredVote = {
   round: number;
@@ -38,4 +46,5 @@ export interface GameCard {
 export interface GameResults {
   players: Player[];
   votes: StoredVote[];
+  armWrestlingVotes: ArmWrestlingVote[];
 }

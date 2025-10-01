@@ -1,9 +1,8 @@
 "use client";
 
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import jsPDF from 'jspdf';
-// import html2canvas from 'html2canvas'; // Removido para importação dinâmica
 import {
   Card,
   CardContent,
@@ -13,7 +12,7 @@ import {
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Loader2, Home, BarChart, Download } from 'lucide-react';
-import type { Player, StoredVote, GameResults } from '@/lib/types';
+import type { Player, GameResults, StoredVote, ArmWrestlingVote } from '@/lib/types';
 import {
   Table,
   TableBody,
@@ -62,6 +61,7 @@ interface PlayerStats {
     assertivePercentage: number;
     truthCategory: string;
     assertivenessCategory: string;
+    armWrestlingWins: number;
 }
 
 export default function ResultsPage() {
@@ -73,7 +73,7 @@ export default function ResultsPage() {
   useEffect(() => {
     const resultsData = localStorage.getItem('gameResults');
     if (resultsData) {
-      const { players, votes }: GameResults = JSON.parse(resultsData);
+      const { players, votes, armWrestlingVotes }: GameResults = JSON.parse(resultsData);
       
       const playerStats = players.map(player => {
         const votesReceived = votes.filter(vote => vote.votedOnId === player.id);
@@ -89,6 +89,8 @@ export default function ResultsPage() {
         const truthPercentage = totalTruthLie > 0 ? Math.round((truth / totalTruthLie) * 100) : 0;
         const assertivePercentage = totalAssertiveInassertive > 0 ? Math.round((assertive / totalAssertiveInassertive) * 100) : 0;
         
+        const armWrestlingWins = (armWrestlingVotes || []).filter(v => v.votedForWinnerId === player.id).length;
+        
         return {
             id: player.id,
             name: player.name,
@@ -100,6 +102,7 @@ export default function ResultsPage() {
             assertivePercentage,
             truthCategory: getTruthCategory(truthPercentage),
             assertivenessCategory: getAssertivenessCategory(assertivePercentage),
+            armWrestlingWins,
         }
       });
 
@@ -181,6 +184,7 @@ export default function ResultsPage() {
                       <TableHead>% Azul</TableHead>
                       <TableHead>Categoria Verdade</TableHead>
                       <TableHead>Categoria Assertividade</TableHead>
+                      <TableHead>Vitórias (Queda de Braço)</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -195,6 +199,7 @@ export default function ResultsPage() {
                         <TableCell>{player.assertivePercentage}%</TableCell>
                         <TableCell>{player.truthCategory}</TableCell>
                         <TableCell>{player.assertivenessCategory}</TableCell>
+                        <TableCell>{player.armWrestlingWins}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
