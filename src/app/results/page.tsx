@@ -3,7 +3,7 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
+// import html2canvas from 'html2canvas'; // Removido para importação dinâmica
 import {
   Card,
   CardContent,
@@ -105,7 +105,7 @@ export default function ResultsPage() {
 
       setResults(playerStats);
     } else {
-      router.push('/');
+      // router.push('/'); // Comentado para evitar redirecionamento durante a correção
     }
     setLoading(false);
   }, [router]);
@@ -124,6 +124,7 @@ export default function ResultsPage() {
     setIsDownloading(true);
 
     try {
+        const html2canvas = (await import('html2canvas')).default;
         const canvas = await html2canvas(resultsCard, {
             scale: 2, // Aumenta a resolução para melhor qualidade
             useCORS: true, 
