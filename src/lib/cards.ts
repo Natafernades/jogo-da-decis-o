@@ -444,6 +444,151 @@ export const CARDS: GameCard[] = [
     { text: "Aceita para não perder a amizade.", color: "vermelha" },
     { text: "Cede e depois guarda rancor.", color: "vermelha" }
   ]
+},
+// ======== CARTAS PACOTE 4 – DIFERENTES ========
+
+// TRABALHO
+{
+  theme: "Trabalho",
+  question: "Você recebe uma proposta de trabalho em outra cidade.",
+  answers: [
+    { text: "Analisa prós e contras antes de decidir.", color: "azul" },
+    { text: "Conversa com a família sobre o impacto da mudança.", color: "azul" },
+    { text: "Aceita imediatamente sem avaliar.", color: "vermelha" },
+    { text: "Recusa por medo de sair da zona de conforto.", color: "vermelha" }
+  ]
+},
+// MEDO
+{
+  theme: "Medo",
+  question: "Você precisa falar em público para muitas pessoas.",
+  answers: [
+    { text: "Se prepara antes com treino e respiração.", color: "azul" },
+    { text: "Encarar como oportunidade de crescimento.", color: "azul" },
+    { text: "Finge uma desculpa para não ir.", color: "vermelha" },
+    { text: "Fala correndo sem se preparar.", color: "vermelha" }
+  ]
+},
+// PERDA
+{
+  theme: "Perda",
+  question: "Um objeto de valor sentimental se perdeu.",
+  answers: [
+    { text: "Aceita a perda e guarda a lembrança afetiva.", color: "azul" },
+    { text: "Cria novas memórias para substituir o vazio.", color: "azul" },
+    { text: "Se apega e não consegue superar a perda.", color: "vermelha" },
+    { text: "Culpa os outros por ter perdido.", color: "vermelha" }
+  ]
+},
+// FAMÍLIA
+{
+  theme: "Família",
+  question: "Seu irmão te pede ajuda em um problema difícil.",
+  answers: [
+    { text: "Escuta e busca soluções junto com ele.", color: "azul" },
+    { text: "Oferece apoio sem julgamentos.", color: "azul" },
+    { text: "Ignora e diz que não é problema seu.", color: "vermelha" },
+    { text: "Zomba da dificuldade dele.", color: "vermelha" }
+  ]
+},
+// AJUDA
+{
+  theme: "Ajuda",
+  question: "Você é chamado para ajudar em um mutirão comunitário.",
+  answers: [
+    { text: "Participa ativamente para colaborar.", color: "azul" },
+    { text: "Leva recursos ou doações.", color: "azul" },
+    { text: "Arruma desculpa para não ir.", color: "vermelha" },
+    { text: "Vai, mas não colabora de verdade.", color: "vermelha" }
+  ]
+},
+// TRAIÇÃO
+{
+  theme: "Traição",
+  question: "Você descobre que um amigo falou mal de você.",
+  answers: [
+    { text: "Conversa com ele para esclarecer.", color: "azul" },
+    { text: "Avalia se a amizade ainda vale a pena.", color: "azul" },
+    { text: "Fala mal dele também para se vingar.", color: "vermelha" },
+    { text: "Se afasta sem explicar nada.", color: "vermelha" }
+  ]
+},
+// SUPERAÇÃO
+{
+  theme: "Superação",
+  question: "Você não conseguiu cumprir um desafio pessoal.",
+  answers: [
+    { text: "Revê os erros e cria um novo plano.", color: "azul" },
+    { text: "Tenta novamente de forma gradual.", color: "azul" },
+    { text: "Desiste e evita desafios.", color: "vermelha" },
+    { text: "Culpa a má sorte pelo fracasso.", color: "vermelha" }
+  ]
+},
+// VÍCIO
+{
+  theme: "Vício",
+  question: "Você percebe que está exagerando no celular.",
+  answers: [
+    { text: "Cria horários específicos para uso.", color: "azul" },
+    { text: "Troca o hábito por atividades saudáveis.", color: "azul" },
+    { text: "Passa noites sem dormir rolando tela.", color: "vermelha" },
+    { text: "Ignora alertas de tempo de uso.", color: "vermelha" }
+  ]
+},
+// INJUSTIÇA
+{
+  theme: "Injustiça",
+  question: "Você foi acusado injustamente no trabalho.",
+  answers: [
+    { text: "Mostra provas para se defender.", color: "azul" },
+    { text: "Conversa diretamente com o responsável.", color: "azul" },
+    { text: "Aceita a culpa mesmo sem ter feito.", color: "vermelha" },
+    { text: "Se revolta sem apresentar argumentos.", color: "vermelha" }
+  ]
+},
+// LIBERDADE
+{
+  theme: "Liberdade",
+  question: "Seus pais não aprovam suas escolhas pessoais.",
+  answers: [
+    { text: "Explica seus motivos de forma respeitosa.", color: "azul" },
+    { text: "Mostra que consegue ser responsável.", color: "azul" },
+    { text: "Obedece sem questionar.", color: "vermelha" },
+    { text: "Rompe relações por rebeldia.", color: "vermelha" }
+  ]
+},
+// DOENÇA
+{
+  theme: "Doença",
+  question: "Um amigo está doente e precisa de apoio.",
+  answers: [
+    { text: "Oferece ajuda e companhia.", color: "azul" },
+    { text: "Incentiva a buscar tratamento.", color: "azul" },
+    { text: "Se afasta para não lidar com a situação.", color: "vermelha" },
+    { text: "Ignora dizendo que não tem tempo.", color: "vermelha" }
+  ]
+},
+// CULPA
+{
+  theme: "Culpa",
+  question: "Você esqueceu o aniversário de alguém importante.",
+  answers: [
+    { text: "Reconhece e pede desculpa sinceramente.", color: "azul" },
+    { text: "Compensa com uma atitude especial.", color: "azul" },
+    { text: "Finge que não se importa.", color: "vermelha" },
+    { text: "Inventa uma desculpa falsa.", color: "vermelha" }
+  ]
+},
+// AMIZADE
+{
+  theme: "Amizade",
+  question: "Seu amigo te pede dinheiro emprestado.",
+  answers: [
+    { text: "Analisa se pode ajudar sem se prejudicar.", color: "azul" },
+    { text: "Oferece outra forma de apoio se não puder emprestar.", color: "azul" },
+    { text: "Empresta mesmo sabendo que vai se complicar.", color: "vermelha" },
+    { text: "Recusa com rispidez.", color: "vermelha" }
+  ]
 }
 ];
 
