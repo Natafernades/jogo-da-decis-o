@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function PreResultsPage() {
   const router = useRouter();
-  const [countdown, setCountdown] = useState(10);
+  const [countdown, setCountdown] = useState(3);
   const adBanner = useMemo(() => PlaceHolderImages.find(img => img.id === 'paid-ad-banner'), []);
 
   useEffect(() => {
